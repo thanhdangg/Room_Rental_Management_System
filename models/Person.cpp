@@ -1,29 +1,4 @@
-#include <string>
-#include <iostream>
-using namespace std;
-
-#ifndef PERSON_H
-#define PERSON_H
-class Person
-{
-protected:
-    string name;
-    string address;
-    string phone;
-public:
-    Person();
-    Person(string name, string address, string phone);
-    ~Person();
-    string getName();
-    string getAddress();
-    string getPhone();
-    void setName(string name);
-    void setAddress(string address);
-    void setPhone(string phone);
-    
-    friend istream &operator>>(istream &in, Person &person);
-    friend ostream &operator<<(ostream &out, Person &person);
-};
+#include "Person.h"
 
 Person::Person()
 {
@@ -38,6 +13,7 @@ Person::Person(string name, string address, string phone)
     this->address = address;
     this->phone = phone;
 }
+
 istream &operator >> (istream &in, Person &person)
 {
     cout << "Enter Information for Person: " << endl;
@@ -49,7 +25,8 @@ istream &operator >> (istream &in, Person &person)
     getline(in, person.phone);
     return in;
 }
-ostream &operator << (ostream &out, Person &person)
+
+ostream &operator << (ostream &out, const Person &person)
 {
     out << "Information for Person: " << endl;
     out << "Name: " << person.name << endl;
@@ -57,32 +34,37 @@ ostream &operator << (ostream &out, Person &person)
     out << "Phone: " << person.phone << endl;
     return out;
 }
-string Person::getName()
+
+string Person::getName() const
 {
     return this->name;
 }
-string Person::getAddress()
+
+string Person::getAddress() const
 {
     return this->address;
 }
-string Person::getPhone()
+
+string Person::getPhone() const
 {
     return this->phone;
 }
-void Person::setName(string name)
+
+void Person::setName(const string& name)
 {
     this->name = name;
 }
-void Person::setAddress(string address)
+
+void Person::setAddress(const string& address)
 {
     this->address = address;
 }
-void Person::setPhone(string phone)
+
+void Person::setPhone(const string& phone)
 {
     this->phone = phone;
 }
+
 Person::~Person()
 {
 }
-
-#endif // PERSON_H
