@@ -1,16 +1,13 @@
-#include "../models/Invoice.h"
-#include "../data_structures/LinkedList.h"
-#include <iostream>
+#include "InvoiceView.h"
 
-class InvoiceView {
-public:
-    static void displayInvoiceDetails(const Invoice &invoice) {
-        std::cout << invoice;
-    }
+using namespace std;
 
-    static void displayAllInvoices(const LinkedList<Invoice> &invoiceList) {
-        for (auto it = invoiceList.begin(); it != invoiceList.end(); ++it) {
-            displayInvoiceDetails(*it);
-        }
+void InvoiceView::displayInvoiceDetails(const Invoice &invoice) {
+    cout << invoice;
+}
+
+void InvoiceView::displayAllInvoices(const LinkedList<Invoice> &invoiceList) {
+    for (auto it = invoiceList.begin(); it != invoiceList.end(); ++it) {
+        displayInvoiceDetails(*it);
     }
-};
+}

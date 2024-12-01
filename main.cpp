@@ -2,10 +2,15 @@
 #include "models/Tenant.h"
 #include "models/Room.h"
 #include "models/Invoice.h"
+#include "models/Contract.h"
+#include "models/User.h"    
 
 #include "controllers/RoomController.h"
 #include "controllers/InvoiceController.h"
 #include "controllers/TenantController.h"
+#include "controllers/ContractController.h"
+#include "controllers/UserController.h"
+
 #include "views/RoomView.h"
 #include "views/InvoiceView.h"
 #include "views/TenantView.h"
@@ -18,23 +23,22 @@
 
 using namespace std;
 
-unordered_map<string, string> ownerCredentials = {{"owner", "owner123"}};
-unordered_map<string, string> tenantCredentials = {{"tenant", "tenant123"}};
-
-bool login(const unordered_map<string, string> &credentials)
+bool login(const LinkedList<User> &userList)
 {
-    string username, password;
-    cout << "Enter username: ";
-    cin >> username;
+    string email, password;
+    cout << "Enter email: ";
+    cin >> email;
     cout << "Enter password: ";
     cin >> password;
 
-    auto it = credentials.find(username);
-    if (it != credentials.end() && it->second == password)
+    for (auto it = userList.begin(); it != userList.end(); ++it)
     {
-        return true;
+        if (it->getEmail() == email && it->getPassword() == password)
+        {
+            return true;
+        }
     }
-    cout << "Invalid username or password!" << endl;
+    cout << "Invalid email or password!" << endl;
     return false;
 }
 
@@ -71,15 +75,14 @@ void displayTenantMenu()
     cout << "=========================" << endl;
     cout << "1. Display Invoice Details" << endl;
     cout << "2. Edit Invoice" << endl;
-    cout << "3. Delete Invoice" << endl;
-    cout << "4. Display Personal Information" << endl;
-    cout << "5. Edit Personal Information" << endl;
-    cout << "6. Exit" << endl;
+    cout << "3. Display Personal Information" << endl;
+    cout << "4. Edit Personal Information" << endl;
+    cout << "5. Exit" << endl;
     cout << "=========================" << endl;
     cout << "Enter your choice: ";
 }
 
-void loadRoomsFromCSV(LinkedList<Room> &roomList, const string &filename)
+void loadRoomsFromCSV(RoomLinkedList& roomList, const string &filename)
 {
     ifstream file(filename);
     if (!file.is_open())
@@ -105,19 +108,137 @@ void loadRoomsFromCSV(LinkedList<Room> &roomList, const string &filename)
 
     for (auto it = roomList.begin(); it != roomList.end(); ++it)
     {
-        RoomView::displayRoomDetails(*it);
+        cout << *it << endl;
     }
+}
+void loadContractsFromCSV(LinkedList<Contract>& contractList, const string& filename)
+{
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cerr << "Error opening file for reading!" << endl;
+        return;
+    }
+    string line;
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        int contractID, tenantID, roomNumber;
+        int startMonth, startYear, endMonth, endYear;
+        string status;
+
+        if (ss >> contractID >> tenantID >> roomNumber >> startMonth >> startYear >> endMonth >> endYear >> status)
+        {
+            std::tm startDate = {};
+            startDate.tm_mon = startMonth - 1; 
+            startDate.tm_year = startYear - 1900; 
+            time_t start = std::mktime(&startDate);
+
+            std::tm endDate = {};
+            endDate.tm_mon = endMonth - 1;
+            endDate.tm_year = endYear - 1900;
+            time_t end = std::mktime(&endDate);
+
+            Contract contract(contractID, tenantID, roomNumber, start, end, status);
+            contractList.add(contract);
+        }
+    }
+    file.close();
+    cout << "Contracts loaded from " << filename << " successfully!" << endl;
+}
+
+void loadInvoicesFromCSV(LinkedList<Invoice> &invoiceList, const string &filename)
+{
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cerr << "Error opening file for reading!" << endl;
+        return;
+    }
+    string line;
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        int roomNumber, tenantID, oldElectricIndex, newElectricIndex, oldWaterIndex, newWaterIndex, month, year;
+        double surcharge;
+        if (ss >> roomNumber >> tenantID >> oldElectricIndex >> newElectricIndex >> oldWaterIndex >> newWaterIndex >> surcharge >> month >> year)
+        {
+            Invoice invoice(roomNumber, tenantID, oldElectricIndex, newElectricIndex, oldWaterIndex, newWaterIndex, surcharge, month, year);
+            invoiceList.add(invoice);
+        }
+    }
+    file.close();
+    cout << "Invoices loaded from " << filename << " successfully!" << endl;
+}
+
+void loadTenantsFromCSV(LinkedList<Tenant>& tenantList, const string& filename)
+{
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cerr << "Error opening file for reading!" << endl;
+        return;
+    }
+    string line;
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        int id;
+        string name, sex, dateOfBirth, email, phone, address;
+        if (ss >> id >> name >> sex >> dateOfBirth >> email >> phone >> address)
+        {
+            Tenant tenant(id, name, sex, dateOfBirth, email, phone, address);
+            tenantList.add(tenant);
+        }
+    }
+    file.close();
+    cout << "Tenants loaded from " << filename << " successfully!" << endl;
+}
+
+void loadUsersFromCSV(LinkedList<User> &userList, const string &filename)
+{
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cerr << "Error opening file for reading!" << endl;
+        return;
+    }
+    string line;
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        string email, password;
+        int role;
+        if (ss >> email >> password >> role)
+        {
+            User user(email, password, role);
+            userList.add(user);
+        }
+    }
+    file.close();
+    cout << "Users loaded from " << filename << " successfully!" << endl;
 }
 int main()
 {
     system("cls");
-    LinkedList<Room> roomList;
+    RoomLinkedList roomList;
     LinkedList<Tenant> tenantList;
     LinkedList<Invoice> invoiceList;
+    LinkedList<Contract> contractList;
+    LinkedList<User> userList;
 
-    RoomController roomController(roomList);
+    RoomController roomController(roomList, RoomView());    
+    InvoiceController invoiceController(invoiceList, InvoiceView());    
     TenantController tenantController(tenantList);
-    InvoiceController invoiceController(invoiceList);
+    ContractController contractController(contractList);    
+    UserController userController(userList, UserView());
+    
+
+    loadContractsFromCSV(contractList, "contract.csv");
+    loadInvoicesFromCSV(invoiceList, "invoice.csv");
+    loadRoomsFromCSV(roomList, "rooms.csv");
+    loadTenantsFromCSV(tenantList, "tenant.csv");
+    loadUsersFromCSV(userList, "user.csv");
 
     int choice;
     int userType;
@@ -125,13 +246,13 @@ int main()
     cout << "Select user type: \n1 for Owner, \n2 for Tenant: ";
     cin >> userType;
 
+    if (!login(userList))
+    {
+        return 1;
+    }
+
     if (userType == 1)
     {
-        if (!login(ownerCredentials))
-        {
-            return 1;
-        }
-
         while (true)
         {
             displayOwnerMenu();
@@ -148,31 +269,31 @@ int main()
                 roomController.addRoom();
                 break;
             case 2:
-                roomController.updateRoomInfo();
+                roomController.updateRoom();
                 break;
             case 3:
                 roomController.deleteRoom();
                 break;
             case 4:
-                roomController.searchRoomInfo();
+                roomController.searchRoom();
                 break;
             case 5:
                 tenantController.addTenant();
                 break;
             case 6:
-                tenantController.updateTenantInfo();
+                tenantController.updateTenant();
                 break;
             case 7:
                 tenantController.deleteTenant();
                 break;
             case 8:
-                tenantController.searchTenantInfo();
+                tenantController.searchTenant();
                 break;
             case 9:
-                invoiceController.createInvoice();
+                invoiceController.addInvoice();
                 break;
             case 10:
-                invoiceController.processInvoicePayment();
+                invoiceController.markInvoiceAsPaid();
                 break;
             case 11:
                 invoiceController.deleteInvoice();
@@ -213,17 +334,12 @@ int main()
     }
     else if (userType == 2)
     {
-        if (!login(tenantCredentials))
-        {
-            return 1;
-        }
-
         while (true)
         {
             displayTenantMenu();
             cin >> choice;
 
-            if (choice == 6)
+            if (choice == 5)
             {
                 break; // Exit
             }
@@ -237,13 +353,10 @@ int main()
                 invoiceController.editInvoice();
                 break;
             case 3:
-                invoiceController.deleteInvoice();
+                // tenantController.displayTenantDetails();
                 break;
             case 4:
-                tenantController.displayTenantDetails();
-                break;
-            case 5:
-                tenantController.editTenant();
+                tenantController.updateTenant();
                 break;
             default:
                 cout << "Invalid choice! Please try again." << endl;

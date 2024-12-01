@@ -1,17 +1,14 @@
 #include "TenantController.h"
-#include "../views/TenantView.h"
-#include <iostream>
 
 using namespace std;
 
 TenantController::TenantController(LinkedList<Tenant>& tenantList) : tenantList(tenantList) {}
 
 void TenantController::addTenant() {
-
     Tenant tenant;
     cin >> tenant;
     tenantList.add(tenant);
-    ofstream file("tenants.csv", ios::app); /
+    ofstream file("tenants.csv", ios::app);
     if (!file.is_open())
     {
         cerr << "Error opening file for writing!" << endl;
@@ -20,7 +17,7 @@ void TenantController::addTenant() {
 
     file << tenant.getId()
          << "," << tenant.getName()
-         << "," << tenant.getPhoneNumber()
+         << "," << tenant.getPhone()
          << "," << tenant.getEmail()
          << "," << tenant.getAddress()
          << "\n";
@@ -30,9 +27,9 @@ void TenantController::addTenant() {
 
 }
 
-void TenantController::editTenant() {
+void TenantController::updateTenant() {
     int id;
-    cout << "Enter tenant ID to edit: ";
+    cout << "Enter tenant ID to update: ";
     cin >> id;
     auto tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
 
@@ -56,23 +53,34 @@ void TenantController::deleteTenant() {
     int id;
     cout << "Enter tenant ID to delete: ";
     cin >> id;
-    if (tenantList.remove([id](const Tenant& t) { return t.getId() == id; })) {
+
+    Tenant* tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
+    if (tenant && tenantList.remove(*tenant)) {
         cout << "Tenant deleted successfully!" << endl;
     } else {
         cout << "Tenant not found!" << endl;
     }
 }
 
-void TenantController::displayTenantDetails() const {
-    TenantView::displayAllTenants(tenantList);
-}
+void TenantController::searchTenant() {
+    int id;
+    cout << "Enter tenant ID to search: ";
+    cin >> id;
+    auto tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
+    if (tenant) {
+        cout << *tenant;
+    } else {
+        cout << "Tenant not found!" << endl;
+    }
+}    
+
 void TenantController::tenantStatistics() {
     cout << "---------------------------- Tenant Statistics ----------------------------" << endl;
     cout << "| Tenant ID | Name        | Phone Number | Email        | Address      |" << endl;
     cout << "--------------------------------------------------------" << endl;
 
     for (const auto& tenant : tenantList) {
-        cout << "| " << tenant.getId() << "      | " << tenant.getName() << "        | " << tenant.getPhoneNumber() 
+        cout << "| " << tenant.getId() << "      | " << tenant.getName() << "        | " << tenant.getPhone() 
              << "      | " << tenant.getEmail() << "        | " << tenant.getAddress() << "        |" << endl;
     }
 

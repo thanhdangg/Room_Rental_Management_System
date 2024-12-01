@@ -1,3 +1,8 @@
-number, type, available, price
-101, 1, 1, 1000
-102, 2, 0, 2000
+roomNumber ,roomType ,isAvailable ,roomPrice
+       101 ,       1 ,true        ,   500.00
+       102 ,       2 ,true        ,   700.00
+       103 ,       1 ,false       ,   550.00
+       104 ,       2 ,true        ,   650.00
+       105 ,       1 ,true        ,   600.00
+       106 ,       2 ,false       ,   750.00
+       107 ,       1 ,true        ,   450.00

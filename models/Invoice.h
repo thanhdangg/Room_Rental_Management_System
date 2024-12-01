@@ -1,5 +1,5 @@
-#ifndef BILL_H
-#define BILL_H
+#ifndef INVOICE_H
+#define INVOICE_H
 
 #include <string>
 #include <iostream>
@@ -23,9 +23,10 @@ private:
 public:
     Invoice();
     Invoice(int roomNumber, int tenantID, int oldElectricIndex, int newElectricIndex, 
-         int oldWaterIndex, int newWaterIndex, double surcharge, int month, int year);
+            int oldWaterIndex, int newWaterIndex, double surcharge, int month, int year);
     ~Invoice();
 
+    int getInvoiceID() const;
     int getRoomNumber() const;
     int getTenantID() const;
     int getOldElectricIndex() const;
@@ -36,7 +37,9 @@ public:
     int getMonth() const;
     int getYear() const;
     double getTotal() const;
+    bool getCharged() const;
 
+    void setInvoiceID(int invoiceId);
     void setRoomNumber(int roomNumber);
     void setTenantID(int tenantID);
     void setOldElectricIndex(int oldElectricIndex);
@@ -46,12 +49,14 @@ public:
     void setSurcharge(double surcharge);
     void setMonth(int month);
     void setYear(int year);
+    void setCharged(bool isCharged);
     void calculateTotal();
 
     friend istream &operator>>(istream &in, Invoice &invoice);
     friend ostream &operator<<(ostream &out, const Invoice &invoice);
 
     bool operator!=(const Invoice& other) const;
+    bool operator==(const Invoice& other) const;    
 };
 
-#endif // BILL_H
+#endif // INVOICE_H

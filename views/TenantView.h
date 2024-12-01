@@ -3,6 +3,7 @@
 
 #include "../models/Tenant.h"
 #include "../data_structures/LinkedList.h"
+#include <iostream>
 
 class TenantView {
 public:

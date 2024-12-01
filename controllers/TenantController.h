@@ -4,16 +4,18 @@
 #include <string>
 #include "../data_structures/LinkedList.h"
 #include "../models/Tenant.cpp"
+#include "../views/TenantView.h"
+#include <iostream>
+#include <fstream>
 
 class TenantController {
 public:
     TenantController(LinkedList<Tenant>& tenantList);
     void addTenant();
-    void displayTenantDetails() const;
-    void editTenant();
     void deleteTenant();
+    void searchTenant();
     void tenantStatistics();
-
+    void updateTenant();    
 
 private:
     LinkedList<Tenant>& tenantList;

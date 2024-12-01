@@ -1,40 +1,66 @@
 #include "Tenant.h"
+#include <iostream>
 
-Tenant::Tenant() : Person(), id(0), sex(""), dateOfBirth(""), email("") {}
+Tenant::Tenant() : Person(), id(0), sex(""), email(""), dateOfBirth(""), phone(""), address("") {}
 
-Tenant::Tenant(int id, const string& name, const string& sex, const string& dateOfBirth, 
-               const string& email, const string& address, const string& phone)
-    : Person(name, address, phone), id(id), sex(sex), dateOfBirth(dateOfBirth), email(email) {}
+Tenant::Tenant(int id, const std::string& name, const std::string& sex, const std::string& dateOfBirth,
+               const std::string& email, const std::string& phone, const std::string& address)
+    : Person(name, address, phone), id(id), sex(sex), email(email), dateOfBirth(dateOfBirth), phone(phone), address(address) {}
 
-int Tenant::getId() const { return id; }
-string Tenant::getEmail() const { return email; }
-string Tenant::getSex() const { return sex; }
-string Tenant::getDateOfBirth() const { return dateOfBirth; }
+int Tenant::getId() const {
+    return id;
+}
 
-void Tenant::setId(int id) { this->id = id; }
-void Tenant::setEmail(const string& email) { this->email = email; }
-void Tenant::setSex(const string& sex) { this->sex = sex; }
-void Tenant::setDateOfBirth(const string& dob) { this->dateOfBirth = dob; }
+std::string Tenant::getEmail() const {
+    return email;
+}
 
-istream& operator>>(istream& in, Tenant& tenant) {
-    in >> static_cast<Person&>(tenant);
-    cout << "Enter ID: ";
-    in >> tenant.id;
-    cout << "Enter Sex: ";
-    in.ignore();
-    getline(in, tenant.sex);
-    cout << "Enter Date of Birth: ";
-    getline(in, tenant.dateOfBirth);
-    cout << "Enter Email: ";
-    getline(in, tenant.email);
+std::string Tenant::getSex() const {
+    return sex;
+}
+
+std::string Tenant::getDateOfBirth() const {
+    return dateOfBirth;
+}
+
+std::string Tenant::getPhone() const {
+    return phone;
+}
+
+void Tenant::setId(int id) {
+    this->id = id;
+}
+
+void Tenant::setEmail(const std::string& email) {
+    this->email = email;
+}
+
+void Tenant::setSex(const std::string& sex) {
+    this->sex = sex;
+}
+
+void Tenant::setDateOfBirth(const std::string& dateOfBirth) {
+    this->dateOfBirth = dateOfBirth;
+}
+
+std::istream& operator>>(std::istream& in, Tenant& tenant) {
+    std::getline(in, tenant.email);
     return in;
 }
 
-ostream& operator<<(ostream& out, const Tenant& tenant) {
+std::ostream& operator<<(std::ostream& out, const Tenant& tenant) {
     out << static_cast<const Person&>(tenant);
-    out << "ID: " << tenant.id << endl;
-    out << "Sex: " << tenant.sex << endl;
-    out << "Date of Birth: " << tenant.dateOfBirth << endl;
-    out << "Email: " << tenant.email << endl;
+    out << "ID: " << tenant.id << std::endl;
+    out << "Sex: " << tenant.sex << std::endl;
+    out << "Date of Birth: " << tenant.dateOfBirth << std::endl;
+    out << "Email: " << tenant.email << std::endl;
     return out;
+}
+
+bool Tenant::operator==(const Tenant& other) const {
+    return id == other.id && email == other.email && sex == other.sex && dateOfBirth == other.dateOfBirth;
+}
+
+bool Tenant::operator!=(const Tenant& other) const {
+    return !(*this == other);
 }

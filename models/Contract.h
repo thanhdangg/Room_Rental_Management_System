@@ -16,7 +16,7 @@ private:
     string status;  
 
 public:
-    Contract(int contractID = 0, int tenantID = 0, int roomNumber = 0, time_t startDate = 0, time_t endDate = 0, const string& status = "");
+    Contract(int contractID, int tenantID, int roomNumber, time_t startDate, time_t endDate, const std::string& status);
 
     int getContractID() const;
     int getTenantID() const;

@@ -1,73 +1,68 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include <stdexcept>
-#include <string>
-#include <cstddef>
+#include <iostream>
+#include <functional>
+#include <vector>
+#include "../models/Room.h"
+#include "../models/Tenant.h"
+#include "../models/Invoice.h"
 
+using namespace std;
 template <typename T>
 class LinkedList {
-protected:
+public:
+    LinkedList() : head(nullptr) {}
+    ~LinkedList();
+    void add(const T &item);
+    bool remove(const T &item);
+    T* find(function<bool(const T&)> predicate);
+    typename vector<T>::iterator begin();
+    typename vector<T>::iterator end();
+    typename vector<T>::const_iterator begin() const;
+    typename vector<T>::const_iterator end() const;
+
+private:
     struct Node {
         T data;
         Node* next;
     };
-
     Node* head;
-    Node* tail;
-
-public:
-    LinkedList() : head(nullptr), tail(nullptr) {}
-    virtual ~LinkedList() {
-        clear();
-    }
-
-    virtual void add(const T& item);
-    virtual bool remove(const T& item);
-    virtual size_t size() const;
-
-    virtual void clear();
-    virtual T* find(const std::function<bool(const T&)>& predicate) const;
-
-    // Iterator class
-    class Iterator {
-    private:
-        Node* current;
-
-    public:
-        explicit Iterator(Node* node) : current(node) {}
-        Iterator& operator++() {
-            current = current->next;
-            return *this;
-        }
-        bool operator!=(const Iterator& other) const { return current != other.current; }
-        T& operator*() const { return current->data; }
-    };
-
-    Iterator begin() const { return Iterator(head); }
-    Iterator end() const { return Iterator(nullptr); }
+    vector<T> data;
 };
 
-// Implementation
 template <typename T>
-void LinkedList<T>::add(const T& item) {
-    Node* newNode = new Node{item, nullptr};
-    if (!head) {
-        head = tail = newNode;
-    } else {
-        tail->next = newNode;
-        tail = newNode;
+LinkedList<T>::~LinkedList() {
+    Node* current = head;
+    while (current) {
+        Node* toDelete = current;
+        current = current->next;
+        delete toDelete;
     }
 }
 
 template <typename T>
-bool LinkedList<T>::remove(const T& item) {
+void LinkedList<T>::add(const T &item) {
+    Node* newNode = new Node{item, nullptr};
+    if (!head) {
+        head = newNode;
+    } else {
+        Node* temp = head;
+        while (temp->next) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    data.push_back(item);
+}
+
+template <typename T>
+bool LinkedList<T>::remove(const T &item) {
     if (!head) return false;
 
     if (head->data == item) {
         Node* toDelete = head;
         head = head->next;
-        if (!head) tail = nullptr; 
         delete toDelete;
         return true;
     }
@@ -80,7 +75,6 @@ bool LinkedList<T>::remove(const T& item) {
     if (current->next) {
         Node* toDelete = current->next;
         current->next = current->next->next;
-        if (!current->next) tail = current; 
         delete toDelete;
         return true;
     }
@@ -88,41 +82,38 @@ bool LinkedList<T>::remove(const T& item) {
     return false;
 }
 
-template <typename T>
-size_t LinkedList<T>::size() const {
-    size_t count = 0;
-    Node* current = head;
-    while (current) {
-        ++count;
-        current = current->next;
-    }
-    return count;
-}
 
 template <typename T>
-void LinkedList<T>::clear() {
-    Node* current = head;
-    while (current) {
-        Node* toDelete = current;
-        current = current->next;
-        delete toDelete;
-    }
-    head = tail = nullptr;
-}
-
-template <typename T>
-T* LinkedList<T>::find(const std::function<bool(const T&)>& predicate) const {
+T* LinkedList<T>::find(function<bool(const T&)> predicate) {
     Node* current = head;
     while (current) {
         if (predicate(current->data)) {
-            return &(current->data);
+            return &current->data;
         }
         current = current->next;
     }
     return nullptr;
 }
 
-#include "../models/Room.h"
+template <typename T>
+typename vector<T>::iterator LinkedList<T>::begin() {
+    return data.begin();
+}
+
+template <typename T>
+typename vector<T>::iterator LinkedList<T>::end() {
+    return data.end();
+}
+
+template <typename T>
+typename vector<T>::const_iterator LinkedList<T>::begin() const {
+    return data.begin();
+}
+
+template <typename T>
+typename vector<T>::const_iterator LinkedList<T>::end() const {
+    return data.end();
+}
 
 class RoomLinkedList : public LinkedList<Room> {
 public:
@@ -133,11 +124,9 @@ public:
     }
 };
 
-#include "../models/Tenant.h"
-
 class TenantLinkedList : public LinkedList<Tenant> {
 public:
-    Tenant* findTenantById(const std::string& tenantID) {
+    Tenant* findTenantById(const int& tenantID) {
         return find([tenantID](const Tenant& tenant) {
             return tenant.getId() == tenantID;
         });

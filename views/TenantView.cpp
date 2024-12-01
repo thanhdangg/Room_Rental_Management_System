@@ -1,5 +1,4 @@
 #include "TenantView.h"
-#include <iostream>
 
 using namespace std;
 

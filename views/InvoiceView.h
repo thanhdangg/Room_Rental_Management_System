@@ -1,14 +1,14 @@
 #ifndef INVOICEVIEW_H
 #define INVOICEVIEW_H
 
-#include "BaseView.h"
 #include "../models/Invoice.h"
+#include "../data_structures/LinkedList.h"
+#include <iostream>
 
-class InvoiceView : public BaseView {
+class InvoiceView {
 public:
-    void displayInvoiceDetails(const Invoice& invoice) {
-        std::cout << "Thông tin hóa đơn: " << invoice.getDetails() << std::endl;
-    }
+    static void displayInvoiceDetails(const Invoice &invoice);
+    static void displayAllInvoices(const LinkedList<Invoice> &invoiceList);
 };
 
 #endif // INVOICEVIEW_H

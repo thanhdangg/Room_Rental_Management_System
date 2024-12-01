@@ -4,42 +4,22 @@
 #include "BaseController.h"
 #include "../models/User.h"
 #include "../views/UserView.h"
-#include <vector>
+#include "../data_structures/LinkedList.h"
+#include <string>
 #include <iostream>
 
 class UserController : public BaseController {
 private:
-    vector<User> users;
+    LinkedList<User>& users;
     UserView view;
 
 public:
-    UserController(const vector<User>& users, const UserView& userView) 
-        : users(users), view(userView) {}
+    UserController(LinkedList<User>& users, const UserView& userView);
 
-    void login(const string& username, const string& password) {
-        bool isValid = false;
-        for (const auto& user : users) {
-            if (user.validateLogin(username, password)) {
-                isValid = true;
-                view.displayMessage("Login successful!");
-                break;
-            }
-        }
-
-        if (!isValid) {
-            view.displayMessage("Invalid username or password.");
-        }
-    }
-
-    void changePassword(const string& oldPassword, const string& newPassword) {
-        
-    }
-
-    void deleteAccount(const string& email) {
-    }
-
-    void execute() override {
-    }
+    void login(const std::string& username, const std::string& password);
+    void changePassword(const std::string& email, const std::string& oldPassword, const std::string& newPassword);
+    void deleteAccount(const std::string& email);
+    void execute() override;
 };
 
 #endif // USERCONTROLLER_H

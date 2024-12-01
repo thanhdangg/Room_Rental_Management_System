@@ -1,17 +1,20 @@
 #include "Invoice.h"
 
-Invoice::Invoice() : roomNumber(0), tenantID(0), oldElectricIndex(0), newElectricIndex(0), 
-               oldWaterIndex(0), newWaterIndex(0), surcharge(0), month(0), year(0), total(0) {}
+Invoice::Invoice() : invoiceId(0), roomNumber(0), tenantID(0), oldElectricIndex(0), newElectricIndex(0),
+                     oldWaterIndex(0), newWaterIndex(0), surcharge(0.0), month(0), year(0), total(0.0), isCharged(false) {}
 
 Invoice::Invoice(int roomNumber, int tenantID, int oldElectricIndex, int newElectricIndex, 
-           int oldWaterIndex, int newWaterIndex, double surcharge, int month, int year)
-    : roomNumber(roomNumber), tenantID(tenantID), oldElectricIndex(oldElectricIndex), 
-      newElectricIndex(newElectricIndex), oldWaterIndex(oldWaterIndex), newWaterIndex(newWaterIndex), 
-      surcharge(surcharge), month(month), year(year) {
+                 int oldWaterIndex, int newWaterIndex, double surcharge, int month, int year)
+    : roomNumber(roomNumber), tenantID(tenantID), oldElectricIndex(oldElectricIndex), newElectricIndex(newElectricIndex),
+      oldWaterIndex(oldWaterIndex), newWaterIndex(newWaterIndex), surcharge(surcharge), month(month), year(year), total(0.0), isCharged(false) {
     calculateTotal();
 }
 
 Invoice::~Invoice() {}
+
+int Invoice::getInvoiceID() const {
+    return invoiceId;
+}
 
 int Invoice::getRoomNumber() const {
     return roomNumber;
@@ -53,6 +56,14 @@ double Invoice::getTotal() const {
     return total;
 }
 
+bool Invoice::getCharged() const {
+    return isCharged;
+}
+
+void Invoice::setInvoiceID(int invoiceId) {
+    this->invoiceId = invoiceId;
+}
+
 void Invoice::setRoomNumber(int roomNumber) {
     this->roomNumber = roomNumber;
 }
@@ -67,7 +78,6 @@ void Invoice::setOldElectricIndex(int oldElectricIndex) {
 
 void Invoice::setNewElectricIndex(int newElectricIndex) {
     this->newElectricIndex = newElectricIndex;
-    calculateTotal();
 }
 
 void Invoice::setOldWaterIndex(int oldWaterIndex) {
@@ -76,12 +86,10 @@ void Invoice::setOldWaterIndex(int oldWaterIndex) {
 
 void Invoice::setNewWaterIndex(int newWaterIndex) {
     this->newWaterIndex = newWaterIndex;
-    calculateTotal();
 }
 
 void Invoice::setSurcharge(double surcharge) {
     this->surcharge = surcharge;
-    calculateTotal();
 }
 
 void Invoice::setMonth(int month) {
@@ -92,48 +100,62 @@ void Invoice::setYear(int year) {
     this->year = year;
 }
 
-void Invoice::calculateTotal() {
-    double electricCost = (newElectricIndex - oldElectricIndex) * 3.5; 
-    double waterCost = (newWaterIndex - oldWaterIndex) * 7; 
-    total = electricCost + waterCost + surcharge;
-}
-bool Invoice::operator!=(const Invoice& other) const {
-    return roomNumber != other.roomNumber || month != other.month || year != other.year;
+void Invoice::setCharged(bool isCharged) {
+    this->isCharged = isCharged;
 }
 
-istream &operator>>(istream &in, Invoice &invoice){
-    cout << "Enter room number: ";
+void Invoice::calculateTotal() {
+    // Implement the logic to calculate the total
+    total = (newElectricIndex - oldElectricIndex) * 0.5 + (newWaterIndex - oldWaterIndex) * 0.3 + surcharge;
+}
+
+istream &operator>>(istream &in, Invoice &invoice) {
+    cout << "Enter Room Number: ";
     in >> invoice.roomNumber;
-    cout << "Enter tenant ID: ";
+    cout << "Enter Tenant ID: ";
     in >> invoice.tenantID;
-    cout << "Enter old electric index: ";
+    cout << "Enter Old Electric Index: ";
     in >> invoice.oldElectricIndex;
-    cout << "Enter new electric index: ";
+    cout << "Enter New Electric Index: ";
     in >> invoice.newElectricIndex;
-    cout << "Enter old water index: ";
+    cout << "Enter Old Water Index: ";
     in >> invoice.oldWaterIndex;
-    cout << "Enter new water index: ";
+    cout << "Enter New Water Index: ";
     in >> invoice.newWaterIndex;
-    cout << "Enter surcharge: ";
+    cout << "Enter Surcharge: ";
     in >> invoice.surcharge;
-    cout << "Enter month: ";
+    cout << "Enter Month: ";
     in >> invoice.month;
-    cout << "Enter year: ";
+    cout << "Enter Year: ";
     in >> invoice.year;
     invoice.calculateTotal();
     return in;
 }
 
 ostream &operator<<(ostream &out, const Invoice &invoice) {
-    out << "Room Number: " << invoice.roomNumber << endl;
-    out << "Tenant ID: " << invoice.tenantID << endl;
-    out << "Old Electric Index: " << invoice.oldElectricIndex << endl;
-    out << "New Electric Index: " << invoice.newElectricIndex << endl;
-    out << "Old Water Index: " << invoice.oldWaterIndex << endl;
-    out << "New Water Index: " << invoice.newWaterIndex << endl;
-    out << "Surcharge: " << invoice.surcharge << endl;
-    out << "Month: " << invoice.month << endl;
-    out << "Year: " << invoice.year << endl;
-    out << "Total: " << invoice.total << endl;
+    out << "Invoice ID: " << invoice.invoiceId << "\n"
+        << "Room Number: " << invoice.roomNumber << "\n"
+        << "Tenant ID: " << invoice.tenantID << "\n"
+        << "Old Electric Index: " << invoice.oldElectricIndex << "\n"
+        << "New Electric Index: " << invoice.newElectricIndex << "\n"
+        << "Old Water Index: " << invoice.oldWaterIndex << "\n"
+        << "New Water Index: " << invoice.newWaterIndex << "\n"
+        << "Surcharge: " << invoice.surcharge << "\n"
+        << "Month: " << invoice.month << "\n"
+        << "Year: " << invoice.year << "\n"
+        << "Total: " << invoice.total << "\n"
+        << "Charged: " << (invoice.isCharged ? "Yes" : "No") << "\n";
     return out;
+}
+
+bool Invoice::operator!=(const Invoice& other) const {
+    return invoiceId != other.invoiceId || roomNumber != other.roomNumber || tenantID != other.tenantID ||
+           oldElectricIndex != other.oldElectricIndex || newElectricIndex != other.newElectricIndex ||
+           oldWaterIndex != other.oldWaterIndex || newWaterIndex != other.newWaterIndex ||
+           surcharge != other.surcharge || month != other.month || year != other.year || total != other.total ||
+           isCharged != other.isCharged;
+}
+
+bool Invoice::operator==(const Invoice& other) const {
+    return !(*this != other);
 }
