@@ -48,15 +48,28 @@
         "cstdarg": "cpp",
         "fstream": "cpp",
         "sstream": "cpp",
-        "ctime": "cpp"
+        "ctime": "cpp",
+        "iomanip": "cpp",
+        "cinttypes": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "variant": "cpp"
     },
     "cSpell.words": [
         "BASECONTROLLER",
         "BILLCONTROLLER",
         "CONTRACTCONTROLLER",
+        "Hoang",
+        "Huynh",
         "INVOICECONTROLLER",
         "INVOICEVIEW",
         "LINKEDLIST",
+        "Luong",
+        "Minh",
+        "Nhat",
         "ROOMVIEW",
         "USERCONTROLLER"
     ]

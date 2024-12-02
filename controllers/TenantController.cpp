@@ -76,13 +76,19 @@ void TenantController::searchTenant() {
 
 void TenantController::tenantStatistics() {
     cout << "---------------------------- Tenant Statistics ----------------------------" << endl;
-    cout << "| Tenant ID | Name        | Phone Number | Email        | Address      |" << endl;
-    cout << "--------------------------------------------------------" << endl;
+    cout << "| " << left << setw(15) << "Tenant ID" 
+         << "| " << left << setw(30) << "Name"
+         << "| " << left << setw(15) << "Phone Number"
+         << "| " << left << setw(25) << "Email"
+         << "| " << left << setw(30) << "Address" << " |" << endl;
+    cout << "-------------------------------------------------------------------------" << endl;
 
     for (const auto& tenant : tenantList) {
-        cout << "| " << tenant.getId() << "      | " << tenant.getName() << "        | " << tenant.getPhone() 
-             << "      | " << tenant.getEmail() << "        | " << tenant.getAddress() << "        |" << endl;
+        cout << "| " << left << setw(15) << tenant.getId() 
+             << "| " << left << setw(30) << tenant.getName() 
+             << "| " << left << setw(15) << tenant.getPhone() 
+             << "| " << left << setw(25) << tenant.getEmail() 
+             << "| " << left << setw(30) << tenant.getAddress() << " |" << endl;
     }
-
     cout << "-------------------------------------------------------------------------" << endl;
 }

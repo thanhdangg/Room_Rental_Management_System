@@ -3,12 +3,15 @@
 Invoice::Invoice() : invoiceId(0), roomNumber(0), tenantID(0), oldElectricIndex(0), newElectricIndex(0),
                      oldWaterIndex(0), newWaterIndex(0), surcharge(0.0), month(0), year(0), total(0.0), isCharged(false) {}
 
-Invoice::Invoice(int roomNumber, int tenantID, int oldElectricIndex, int newElectricIndex, 
+Invoice::Invoice(int roomNumber, int tenantID, int oldElectricIndex, int newElectricIndex,
                  int oldWaterIndex, int newWaterIndex, double surcharge, int month, int year)
-    : roomNumber(roomNumber), tenantID(tenantID), oldElectricIndex(oldElectricIndex), newElectricIndex(newElectricIndex),
-      oldWaterIndex(oldWaterIndex), newWaterIndex(newWaterIndex), surcharge(surcharge), month(month), year(year), total(0.0), isCharged(false) {
-    calculateTotal();
+    : roomNumber(roomNumber), tenantID(tenantID), oldElectricIndex(oldElectricIndex), 
+      newElectricIndex(newElectricIndex), oldWaterIndex(oldWaterIndex), 
+      newWaterIndex(newWaterIndex), surcharge(surcharge), month(month), year(year), 
+      isCharged(false), total(0.0), invoiceId(0) {
+    calculateTotal(); 
 }
+
 
 Invoice::~Invoice() {}
 
@@ -105,8 +108,7 @@ void Invoice::setCharged(bool isCharged) {
 }
 
 void Invoice::calculateTotal() {
-    // Implement the logic to calculate the total
-    total = (newElectricIndex - oldElectricIndex) * 0.5 + (newWaterIndex - oldWaterIndex) * 0.3 + surcharge;
+    total = (newElectricIndex - oldElectricIndex) * 3.5 + (newWaterIndex - oldWaterIndex) * 7 + surcharge;
 }
 
 istream &operator>>(istream &in, Invoice &invoice) {

@@ -3,7 +3,7 @@
 #include "models/Room.h"
 #include "models/Invoice.h"
 #include "models/Contract.h"
-#include "models/User.h"    
+#include "models/User.h"
 
 #include "controllers/RoomController.h"
 #include "controllers/InvoiceController.h"
@@ -20,27 +20,91 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <algorithm>
+#include <ctime>
+#include <iomanip>  
+#include <conio.h>
+#include <openssl/sha.h>
+#include <string>
 
 using namespace std;
 
-bool login(const LinkedList<User> &userList)
+string trim(const string &str)
 {
+    size_t first = str.find_first_not_of(' ');
+    if (first == string::npos)
+        return "";
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, last - first + 1);
+}
+bool parseDate(const string &dateStr, tm &date) {
+    if (dateStr.length() != 10 || dateStr[4] != '-' || dateStr[7] != '-') {
+        return false; 
+    }
+
+    try {
+        date.tm_year = stoi(dateStr.substr(0, 4)) - 1900; 
+        date.tm_mon = stoi(dateStr.substr(5, 2)) - 1;     
+        date.tm_mday = stoi(dateStr.substr(8, 2));       
+        date.tm_hour = 0;
+        date.tm_min = 0;
+        date.tm_sec = 0;
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+string getHiddenPassword() {
+    string password;
+    char ch;
+
+    while ((ch = _getch()) != '\r') { // '\r' is Enter
+        if (ch == '\b') { // Backspace
+            if (!password.empty()) {
+                cout << "\b \b";
+                password.pop_back();
+            }
+        } else {
+            password.push_back(ch);
+            cout << '*'; // show *
+        }
+    }
+    cout << endl;
+
+    return password;
+}
+
+string hashPassword(const string &password) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char *>(password.c_str()), password.size(), hash);
+
+    ostringstream os;
+    for (size_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+        os << hex << setw(2) << setfill('0') << static_cast<int>(hash[i]);
+    }
+    return os.str();
+}
+
+bool login(const LinkedList<User> &userList) {
     string email, password;
+
     cout << "Enter email: ";
     cin >> email;
-    cout << "Enter password: ";
-    cin >> password;
 
-    for (auto it = userList.begin(); it != userList.end(); ++it)
-    {
-        if (it->getEmail() == email && it->getPassword() == password)
-        {
+    cout << "Enter password: ";
+    password = getHiddenPassword(); 
+
+    for (auto it = userList.begin(); it != userList.end(); ++it) {
+        if (it->getEmail() == email && it->getPassword() == hashPassword(password)) {
+            cout << "Login successful!" << endl;
             return true;
         }
     }
+
     cout << "Invalid email or password!" << endl;
     return false;
 }
+
 
 void displayOwnerMenu()
 {
@@ -64,8 +128,9 @@ void displayOwnerMenu()
     cout << "17. Room Statistics" << endl;
     cout << "18. Tenant Statistics" << endl;
     cout << "19. Invoice Statistics" << endl;
-    cout << "20. Revenue Statistics" << endl;
-    cout << "21. Logout" << endl;
+    cout << "20. Contract Statistics" << endl;
+    cout << "21. Revenue Statistics" << endl;
+    cout << "22. Logout" << endl;
     cout << "==============================================================" << endl;
     cout << "Enter your choice: ";
 }
@@ -82,7 +147,7 @@ void displayTenantMenu()
     cout << "Enter your choice: ";
 }
 
-void loadRoomsFromCSV(RoomLinkedList& roomList, const string &filename)
+void loadRoomsFromCSV(RoomLinkedList &roomList, const string &filename)
 {
     ifstream file(filename);
     if (!file.is_open())
@@ -98,9 +163,23 @@ void loadRoomsFromCSV(RoomLinkedList& roomList, const string &filename)
         if (getline(ss, number, ',') && getline(ss, type, ',') &&
             getline(ss, available, ',') && getline(ss, price, ','))
         {
-            int roomType = stoi(type);
-            Room room(stoi(number), roomType, available == "1", stod(price));
-            roomList.add(room);
+            try
+            {
+                int roomNumber = stoi(number);
+                int roomType = stoi(type);
+                bool isAvailable = (available == "1");
+                double roomPrice = stod(price);
+                Room room(roomNumber, roomType, isAvailable, roomPrice);
+                roomList.add(room);
+            }
+            catch (const invalid_argument &e)
+            {
+                cerr << "Invalid data in file Room: " << e.what() << endl;
+            }
+            catch (const out_of_range &e)
+            {
+                cerr << "Data out of range in file: " << e.what() << endl;
+            }
         }
     }
     file.close();
@@ -111,41 +190,62 @@ void loadRoomsFromCSV(RoomLinkedList& roomList, const string &filename)
         cout << *it << endl;
     }
 }
-void loadContractsFromCSV(LinkedList<Contract>& contractList, const string& filename)
-{
+
+void loadContractsFromCSV(LinkedList<Contract> &contractList, const string &filename) {
     ifstream file(filename);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         cerr << "Error opening file for reading!" << endl;
         return;
     }
+
     string line;
-    while (getline(file, line))
-    {
+    getline(file, line); 
+    while (getline(file, line)) {
         stringstream ss(line);
-        int contractID, tenantID, roomNumber;
-        int startMonth, startYear, endMonth, endYear;
-        string status;
+        string contractIDStr, tenantIDStr, roomNumberStr, startDateStr, endDateStr, status;
 
-        if (ss >> contractID >> tenantID >> roomNumber >> startMonth >> startYear >> endMonth >> endYear >> status)
-        {
-            std::tm startDate = {};
-            startDate.tm_mon = startMonth - 1; 
-            startDate.tm_year = startYear - 1900; 
-            time_t start = std::mktime(&startDate);
+        getline(ss, contractIDStr, ',');
+        getline(ss, tenantIDStr, ',');
+        getline(ss, roomNumberStr, ',');
+        getline(ss, startDateStr, ',');
+        getline(ss, endDateStr, ',');
+        getline(ss, status, ',');
 
-            std::tm endDate = {};
-            endDate.tm_mon = endMonth - 1;
-            endDate.tm_year = endYear - 1900;
-            time_t end = std::mktime(&endDate);
+        contractIDStr = trim(contractIDStr);
+        tenantIDStr = trim(tenantIDStr);
+        roomNumberStr = trim(roomNumberStr);
+        startDateStr = trim(startDateStr);
+        endDateStr = trim(endDateStr);
+        status = trim(status);
+
+        try {
+            int contractID = stoi(contractIDStr);
+            int tenantID = stoi(tenantIDStr);
+            int roomNumber = stoi(roomNumberStr);
+
+            tm startDate = {}, endDate = {};
+            if (!parseDate(startDateStr, startDate) || !parseDate(endDateStr, endDate)) {
+                throw invalid_argument("Invalid date format");
+            }
+
+            time_t start = mktime(&startDate);
+            time_t end = mktime(&endDate);
 
             Contract contract(contractID, tenantID, roomNumber, start, end, status);
             contractList.add(contract);
+        } catch (const exception &e) {
+            cerr << "Error processing line: " << line << "\nReason: " << e.what() << endl;
         }
     }
+
     file.close();
-    cout << "Contracts loaded from " << filename << " successfully!" << endl;
+    cout << "Contracts loaded from " << filename << " successfully! Count: " << contractList.size() << endl;
+    for (auto it = contractList.begin(); it!= contractList.end(); ++it) {
+        cout << *it << endl;
+    }
 }
+
+
 
 void loadInvoicesFromCSV(LinkedList<Invoice> &invoiceList, const string &filename)
 {
@@ -155,69 +255,168 @@ void loadInvoicesFromCSV(LinkedList<Invoice> &invoiceList, const string &filenam
         cerr << "Error opening file for reading!" << endl;
         return;
     }
+
     string line;
+    bool isFirstLine = true;
     while (getline(file, line))
     {
-        stringstream ss(line);
-        int roomNumber, tenantID, oldElectricIndex, newElectricIndex, oldWaterIndex, newWaterIndex, month, year;
-        double surcharge;
-        if (ss >> roomNumber >> tenantID >> oldElectricIndex >> newElectricIndex >> oldWaterIndex >> newWaterIndex >> surcharge >> month >> year)
+        if (isFirstLine)
         {
-            Invoice invoice(roomNumber, tenantID, oldElectricIndex, newElectricIndex, oldWaterIndex, newWaterIndex, surcharge, month, year);
-            invoiceList.add(invoice);
+            isFirstLine = false;
+            continue; // Skip the header line
+        }
+
+        stringstream ss(line);
+        string invoiceIdStr, roomNumberStr, tenantIDStr, oldElectricIndexStr,
+            newElectricIndexStr, oldWaterIndexStr, newWaterIndexStr, surchargeStr,
+            monthStr, yearStr, totalStr, isChargedStr;
+
+        if (getline(ss, invoiceIdStr, ',') &&
+            getline(ss, roomNumberStr, ',') &&
+            getline(ss, tenantIDStr, ',') &&
+            getline(ss, oldElectricIndexStr, ',') &&
+            getline(ss, newElectricIndexStr, ',') &&
+            getline(ss, oldWaterIndexStr, ',') &&
+            getline(ss, newWaterIndexStr, ',') &&
+            getline(ss, surchargeStr, ',') &&
+            getline(ss, monthStr, ',') &&
+            getline(ss, yearStr, ',') &&
+            getline(ss, totalStr, ',') &&
+            getline(ss, isChargedStr, ','))
+        {
+
+            try
+            {
+                int invoiceId = stoi(trim(invoiceIdStr));
+                int roomNumber = stoi(trim(roomNumberStr));
+                int tenantID = stoi(trim(tenantIDStr));
+                int oldElectricIndex = stoi(trim(oldElectricIndexStr));
+                int newElectricIndex = stoi(trim(newElectricIndexStr));
+                int oldWaterIndex = stoi(trim(oldWaterIndexStr));
+                int newWaterIndex = stoi(trim(newWaterIndexStr));
+                double surcharge = stod(trim(surchargeStr));
+                int month = stoi(trim(monthStr));
+                int year = stoi(trim(yearStr));
+                double total = stod(trim(totalStr));
+                bool isCharged = trim(isChargedStr) == "true";
+
+                Invoice invoice(roomNumber, tenantID, oldElectricIndex, newElectricIndex,
+                                oldWaterIndex, newWaterIndex, surcharge, month, year);
+                invoice.setInvoiceID(invoiceId);
+                invoice.setCharged(isCharged);
+                invoiceList.add(invoice);
+            }
+            catch (const exception &e)
+            {
+                cerr << "Error processing line: " << line << " - " << e.what() << endl;
+            }
+        }
+        else
+        {
+            cerr << "Error reading line: " << line << endl;
         }
     }
     file.close();
     cout << "Invoices loaded from " << filename << " successfully!" << endl;
+
+    for (auto it = invoiceList.begin(); it != invoiceList.end(); ++it)
+    {
+        cout << *it << endl;
+    }
 }
 
-void loadTenantsFromCSV(LinkedList<Tenant>& tenantList, const string& filename)
-{
+void loadTenantsFromCSV(LinkedList<Tenant> &tenantList, const string &filename) {
     ifstream file(filename);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         cerr << "Error opening file for reading!" << endl;
         return;
     }
+
     string line;
-    while (getline(file, line))
-    {
+    getline(file, line); 
+    while (getline(file, line)) {
         stringstream ss(line);
-        int id;
-        string name, sex, dateOfBirth, email, phone, address;
-        if (ss >> id >> name >> sex >> dateOfBirth >> email >> phone >> address)
-        {
+        string idStr, name, address, phone, email, sex, dateOfBirth;
+
+        getline(ss, idStr, ',');
+        getline(ss, name, ',');
+        getline(ss, address, ',');
+        getline(ss, phone, ',');
+        getline(ss, email, ',');
+        getline(ss, sex, ',');
+        getline(ss, dateOfBirth, ',');
+
+        idStr = trim(idStr);
+        name = trim(name);
+        address = trim(address);
+        phone = trim(phone);
+        email = trim(email);
+        sex = trim(sex);
+        dateOfBirth = trim(dateOfBirth);
+
+        try {
+            int id = stoi(idStr);
+
             Tenant tenant(id, name, sex, dateOfBirth, email, phone, address);
             tenantList.add(tenant);
+        } catch (const exception &e) {
+            cerr << "Error processing line: " << line << "\nReason: " << e.what() << endl;
         }
     }
+
     file.close();
     cout << "Tenants loaded from " << filename << " successfully!" << endl;
+
+    for (auto it = tenantList.begin(); it != tenantList.end(); ++it) {
+        cout << *it << endl;
+    }
 }
 
-void loadUsersFromCSV(LinkedList<User> &userList, const string &filename)
-{
+
+void loadUsersFromCSV(LinkedList<User> &userList, const string &filename) {
     ifstream file(filename);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         cerr << "Error opening file for reading!" << endl;
         return;
     }
+
     string line;
-    while (getline(file, line))
-    {
+    getline(file, line);
+    while (getline(file, line)) {
         stringstream ss(line);
-        string email, password;
+        string email, password, roleStr;
         int role;
-        if (ss >> email >> password >> role)
-        {
+
+        getline(ss, email, ',');
+        getline(ss, password, ',');
+        getline(ss, roleStr, ',');
+
+        email = trim(email);
+        password = trim(password);
+        roleStr = trim(roleStr);
+
+        try {
+            role = (roleStr == "Admin") ? 1 : (roleStr == "User" ? 2 : 0);
+
+            if (role == 0) {
+                throw invalid_argument("Invalid role value: " + roleStr);
+            }
+
             User user(email, password, role);
             userList.add(user);
+        } catch (const exception &e) {
+            cerr << "Error processing line: " << line << "\nReason: " << e.what() << endl;
         }
     }
+
     file.close();
     cout << "Users loaded from " << filename << " successfully!" << endl;
+
+    for (auto it = userList.begin(); it != userList.end(); ++it) {
+        cout << *it << endl;
+    }
 }
+
 int main()
 {
     system("cls");
@@ -227,23 +426,23 @@ int main()
     LinkedList<Contract> contractList;
     LinkedList<User> userList;
 
-    RoomController roomController(roomList, RoomView());    
-    InvoiceController invoiceController(invoiceList, InvoiceView());    
-    TenantController tenantController(tenantList);
-    ContractController contractController(contractList);    
-    UserController userController(userList, UserView());
-    
-
     loadContractsFromCSV(contractList, "contract.csv");
     loadInvoicesFromCSV(invoiceList, "invoice.csv");
     loadRoomsFromCSV(roomList, "rooms.csv");
     loadTenantsFromCSV(tenantList, "tenant.csv");
     loadUsersFromCSV(userList, "user.csv");
 
+    RoomController roomController(roomList, RoomView());
+    InvoiceController invoiceController(invoiceList, InvoiceView());
+    TenantController tenantController(tenantList);
+    ContractController contractController(contractList);
+    UserController userController(userList, UserView());
+
     int choice;
     int userType;
 
-    cout << "Select user type: \n1 for Owner, \n2 for Tenant: ";
+    cout << "Select user type: \n1 for Owner, \n2 for Tenant: \n";
+    cout << "Enter your choice: ";
     cin >> userType;
 
     if (!login(userList))
@@ -258,7 +457,7 @@ int main()
             displayOwnerMenu();
             cin >> choice;
 
-            if (choice == 21)
+            if (choice == 22)
             {
                 break; // Logout
             }
@@ -323,6 +522,9 @@ int main()
                 invoiceController.invoiceStatistics();
                 break;
             case 20:
+                contractController.contractStatistics();
+                break;  
+            case 21:
                 invoiceController.revenueStatistics();
                 break;
             default:

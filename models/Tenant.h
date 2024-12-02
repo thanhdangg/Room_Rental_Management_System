@@ -2,7 +2,6 @@
 #define TENANT_H
 
 #include <string>
-#include <iostream>
 #include "Person.h"
 
 class Tenant : public Person {
@@ -11,8 +10,6 @@ private:
     std::string sex;
     std::string email;
     std::string dateOfBirth;
-    std::string phone;
-    std::string address;
 
 public:
     Tenant();
@@ -23,7 +20,6 @@ public:
     std::string getEmail() const;
     std::string getSex() const;
     std::string getDateOfBirth() const;
-    std::string getPhone() const;
 
     void setId(int id);
     void setEmail(const std::string& email);

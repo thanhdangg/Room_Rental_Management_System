@@ -111,16 +111,42 @@ void InvoiceController::searchInvoice() {
 
 void InvoiceController::invoiceStatistics() const {
     cout << "--------------------------- Invoice Statistics ----------------------------" << endl;
-    cout << "| Invoice ID | Tenant ID | Amount  | Due Date   | Status    |" << endl;
-    cout << "-------------------------------------------------------------------------" << endl;
-
+    
+    cout << left 
+         << setw(15) << "| Invoice ID" 
+         << setw(15) << "| Room Number" 
+         << setw(15) << "| Tenant ID" 
+         << setw(20) << "| Old Electric Index" 
+         << setw(20) << "| New Electric Index" 
+         << setw(20) << "| Old Water Index" 
+         << setw(20) << "| New Water Index" 
+         << setw(15) << "| Surcharge" 
+         << setw(10) << "| Month" 
+         << setw(10) << "| Year" 
+         << setw(15) << "| Total" 
+         << setw(15) << "| Charged" 
+         << "|" << endl;
+    
+    cout << "--------------------------------------------------------------------------------------------------------------------------" << endl;
+    
     for (const auto &invoice : invoiceList) {
-        cout << "| " << invoice.getInvoiceID() << "         | " << invoice.getTenantID() << "        | "
-             << invoice.getTotal() << "       | " << invoice.getMonth() << "/" << invoice.getYear() << "      | "
-             << (invoice.getCharged() ? "Paid" : "Unpaid") << "      |" << endl;
+        cout << left 
+             << setw(15) << "| " << invoice.getInvoiceID() 
+             << setw(15) << "| " << invoice.getRoomNumber() 
+             << setw(15) << "| " << invoice.getTenantID() 
+             << setw(20) << "| " << invoice.getOldElectricIndex() 
+             << setw(20) << "| " << invoice.getNewElectricIndex() 
+             << setw(20) << "| " << invoice.getOldWaterIndex() 
+             << setw(20) << "| " << invoice.getNewWaterIndex() 
+             << setw(15) << "| " << invoice.getSurcharge() 
+             << setw(10) << "| " << invoice.getMonth() 
+             << setw(10) << "| " << invoice.getYear() 
+             << setw(15) << "| " << invoice.getTotal() 
+             << setw(15) << "| " << (invoice.getCharged() ? "Paid" : "Unpaid")
+             << "|" << endl;
     }
 
-    cout << "-------------------------------------------------------------------------" << endl;
+    cout << "--------------------------------------------------------------------------------------------------------------------------" << endl;
 }
 
 void InvoiceController::revenueStatistics() const {

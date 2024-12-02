@@ -3,10 +3,11 @@
 
 #include <string>
 #include "../data_structures/LinkedList.h"
-#include "../models/Tenant.cpp"
+#include "../models/Tenant.h"
 #include "../views/TenantView.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 class TenantController {
 public:

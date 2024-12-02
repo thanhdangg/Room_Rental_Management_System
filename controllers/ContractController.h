@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <iomanip> 
 
 class ContractController {
 private:
@@ -18,6 +19,7 @@ public:
     void updateContract();
     void endContract();
     void searchContract();
+    void contractStatistics();  
 
     ~ContractController();
 };

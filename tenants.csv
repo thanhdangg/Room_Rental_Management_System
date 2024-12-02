@@ -1,0 +1,6 @@
+id   ,name                ,address               ,phone      ,email                ,sex    ,dateOfBirth
+1001 ,Nguyen Thanh Dang   ,120 Nguyen Luong Bang ,1234567890 ,dang.nguyen@mail.com ,Male   ,2003-09-09
+1002 ,Huynh Tu            ,144 Nguyen Luong Bang ,0987654321 ,tu.huynh@mail.com    ,Female ,2001-05-12
+1003 ,Nguyen Thanh Than   ,Hoa Son               ,1122334455 ,than.nguyen@mail.com ,Male   ,2005-08-23
+1004 ,Do Nhat Hoang       ,82 Nguyen Luong Bang  ,2233445566 ,hoang.do@mail.com    ,Female ,2002-04-10
+1005 ,Nguyen Thi Minh Tam ,37 Hoang Tang Bi      ,3344556677 ,tam.nguyen@mail.com  ,Male   ,2000-12-150,,,,

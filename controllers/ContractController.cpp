@@ -1,6 +1,9 @@
 #include "ContractController.h"
 #include <iostream>
 #include <ctime>
+#include <iomanip>
+#include <ctime>
+#include <chrono>
 
 using namespace std;
 
@@ -106,6 +109,43 @@ void ContractController::searchContract() {
     if (!found) {
         cout << "Contract not found!" << endl;
     }
+}
+void ContractController::contractStatistics() {
+   cout << "------------------------------ Contract Statistics ------------------------------" << endl;
+    
+    cout << left
+         << setw(15) << "| Contract ID" 
+         << setw(15) << "| Tenant ID" 
+         << setw(15) << "| Room Number" 
+         << setw(20) << "| Start Date" 
+         << setw(20) << "| End Date" 
+         << setw(15) << "| Status" 
+         << "|" << endl;
+
+    cout << "----------------------------------------------------------------------------------------------------" << endl;
+
+    for (const auto& contract : contracts) {
+        auto startDate = chrono::system_clock::from_time_t(contract.getStartDate());
+        auto endDate = chrono::system_clock::from_time_t(contract.getEndDate());
+        
+        time_t startTime = chrono::system_clock::to_time_t(startDate);
+        time_t endTime = chrono::system_clock::to_time_t(endDate);
+        
+        tm startTm = *localtime(&startTime);
+        tm endTm = *localtime(&endTime);
+
+        cout << left
+             << setw(15) << "| " << contract.getContractID()
+             << setw(15) << "| " << contract.getTenantID()
+             << setw(15) << "| " << contract.getRoomNumber()
+             << setw(20) << "| " << put_time(&startTm, "%d/%m/%Y")
+             << setw(20) << "| " << put_time(&endTm, "%d/%m/%Y")
+             << setw(15) << "| " << contract.getStatus()
+             << "|" << endl;
+    }
+
+    cout << "----------------------------------------------------------------------------------------------------" << endl;
+
 }
 
 ContractController::~ContractController() {}

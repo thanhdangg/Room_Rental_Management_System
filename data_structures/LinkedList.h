@@ -21,6 +21,9 @@ public:
     typename vector<T>::iterator end();
     typename vector<T>::const_iterator begin() const;
     typename vector<T>::const_iterator end() const;
+    int size() const; 
+
+
 
 private:
     struct Node {
@@ -29,6 +32,7 @@ private:
     };
     Node* head;
     vector<T> data;
+    int listSize;
 };
 
 template <typename T>
@@ -54,6 +58,7 @@ void LinkedList<T>::add(const T &item) {
         temp->next = newNode;
     }
     data.push_back(item);
+    listSize++; 
 }
 
 template <typename T>
@@ -64,6 +69,7 @@ bool LinkedList<T>::remove(const T &item) {
         Node* toDelete = head;
         head = head->next;
         delete toDelete;
+        listSize--;
         return true;
     }
 
@@ -113,6 +119,11 @@ typename vector<T>::const_iterator LinkedList<T>::begin() const {
 template <typename T>
 typename vector<T>::const_iterator LinkedList<T>::end() const {
     return data.end();
+}
+
+template <typename T>
+int LinkedList<T>::size() const {
+    return listSize;
 }
 
 class RoomLinkedList : public LinkedList<Room> {
