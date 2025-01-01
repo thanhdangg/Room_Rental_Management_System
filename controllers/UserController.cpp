@@ -3,7 +3,7 @@
 UserController::UserController(LinkedList<User>& users, const UserView& userView)
     : users(users), view(userView) {}
 
-void UserController::login(const std::string& username, const std::string& password) {
+void UserController::login(const string& username, const string& password) {
     bool isValid = false;
     for (const auto& user : users) {
         if (user.getEmail() == username && user.getPassword() == password) {
@@ -18,7 +18,7 @@ void UserController::login(const std::string& username, const std::string& passw
     }
 }
 
-void UserController::changePassword(const std::string& email, const std::string& oldPassword, const std::string& newPassword) {
+void UserController::changePassword(const string& email, const string& oldPassword, const string& newPassword) {
     for (auto& user : users) {
         if (user.getEmail() == email && user.getPassword() == oldPassword) {
             user.setPassword(newPassword);
@@ -29,7 +29,7 @@ void UserController::changePassword(const std::string& email, const std::string&
     view.displayMessage("Invalid email or old password.");
 }
 
-void UserController::deleteAccount(const std::string& email) {
+void UserController::deleteAccount(const string& email) {
     for (auto it = users.begin(); it != users.end(); ++it) {
         if (it->getEmail() == email) {
             users.remove(*it);
@@ -40,6 +40,6 @@ void UserController::deleteAccount(const std::string& email) {
     view.displayMessage("Account not found.");
 }
 
-void UserController::execute() {
-    // Implementation of execute method
+void UserController::updateCSV()
+{
 }

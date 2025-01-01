@@ -66,11 +66,16 @@
         "Huynh",
         "INVOICECONTROLLER",
         "INVOICEVIEW",
+        "lcrypto",
         "LINKEDLIST",
+        "lssl",
         "Luong",
         "Minh",
         "Nhat",
+        "PHONG",
+        "QUAN",
         "ROOMVIEW",
+        "TRINH",
         "USERCONTROLLER"
     ]
 }

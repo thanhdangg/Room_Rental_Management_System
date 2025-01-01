@@ -5,21 +5,26 @@
 #include "../data_structures/LinkedList.h"
 #include "../models/Tenant.h"
 #include "../views/TenantView.h"
+#include "BaseController.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
-class TenantController {
+using namespace std;
+
+class TenantController : public BaseController {
 public:
-    TenantController(LinkedList<Tenant>& tenantList);
+    TenantController(LinkedList<Tenant> &tenantList);
     void addTenant();
     void deleteTenant();
-    void searchTenant();
+    void searchTenant(int iD);
     void tenantStatistics();
-    void updateTenant();    
+    void updateTenant(int id);
+
+    void updateCSV() override;
 
 private:
-    LinkedList<Tenant>& tenantList;
+    LinkedList<Tenant> &tenantList;
 };
 
 #endif // TENANTCONTROLLER_H

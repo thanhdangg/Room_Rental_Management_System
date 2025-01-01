@@ -5,7 +5,12 @@
 #include "../models/Room.h"
 #include "../views/RoomView.h"
 #include "../data_structures/LinkedList.h"
+#include <iostream>
+#include <fstream>
+#include <iomanip> 
+#include <string>
 
+using namespace std; 
 class RoomController : public BaseController {
 private:
     RoomLinkedList& roomList; 
@@ -17,11 +22,12 @@ public:
     void addRoom();
     void deleteRoom();
     void updateRoom();
-    void searchRoom();
+    void searchRoom(int roomNumber);
     void bookRoom(int roomNumber);
     void cancelRoomBooking(int roomNumber);
     void roomStatistics();
-    void execute() override;
+    
+    void updateCSV() override;
 };
 
 #endif // ROOMCONTROLLER_H

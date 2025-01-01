@@ -32,7 +32,7 @@ istream &operator>>(istream &in, Room &room)
         in.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    cout << "Enter Room Type (1, 2, or 3): ";
+    cout << "Enter Room Type (1 for small room , 2 for medium room, or 3 large room): ";
     while (!(in >> room.roomType) || (room.roomType < 1 || room.roomType > 3))
     {
         cout << "Invalid room type. Please enter a value (1, 2, or 3): ";
@@ -63,7 +63,19 @@ ostream &operator<<(ostream &out, const Room &room)
 {
     out << "Information for Room: " << endl;
     out << "Room Number: " << room.roomNumber << endl;
-    out << "Room Type: " << room.roomType << endl;
+    out << "Room Type: ";
+    switch (room.roomType)
+    {
+    case 1:
+        out << "Small Room" << endl;
+        break;
+    case 2:
+        out << "Medium Room" << endl;
+        break;
+    case 3:
+        out << "Large Room" << endl;
+        break;
+    }
     out << "Room Status: " << (room.isAvailable ? "Available" : "Unavailable") << endl;
     out << "Room Price: " << room.roomPrice << endl;
     return out;

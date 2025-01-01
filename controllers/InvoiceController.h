@@ -8,6 +8,9 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip> 
+#include <string>
+
+using namespace std; 
 
 class InvoiceController : public BaseController {
 private:
@@ -20,16 +23,18 @@ public:
     void addInvoice();                      
     void displayInvoiceDetails() const;        
     void displayInvoicesByMonth(int month, int year, int roomNumber) const; 
+    void displayInvoicesByTenant(int tenantID) const;
     void editInvoice();                       
     void deleteInvoice();   
     void markInvoiceAsPaid();   
-    void searchInvoice();
-                
-
+    void searchInvoice(int roomTenant);
     void invoiceStatistics() const;           
-    void revenueStatistics() const;          
+    void revenueStatistics() const;  
 
-    void execute() override;
+    void updateCSV() override;
+
+    ~InvoiceController();        
+
 };
 
 #endif // INVOICECONTROLLER_H

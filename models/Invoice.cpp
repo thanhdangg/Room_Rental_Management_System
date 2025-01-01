@@ -130,6 +130,9 @@ istream &operator>>(istream &in, Invoice &invoice) {
     in >> invoice.month;
     cout << "Enter Year: ";
     in >> invoice.year;
+    cout << "Is charged? (1: Yes, 0: No): ";
+    in >> invoice.isCharged;
+    
     invoice.calculateTotal();
     return in;
 }

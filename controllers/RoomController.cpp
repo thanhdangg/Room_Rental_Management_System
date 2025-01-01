@@ -1,19 +1,20 @@
 #include "RoomController.h"
 #include <fstream>
 
-
 using namespace std;
 
-RoomController::RoomController(RoomLinkedList& roomList, const RoomView& roomView)
+RoomController::RoomController(RoomLinkedList &roomList, const RoomView &roomView)
     : roomList(roomList), view(roomView) {}
-    
-void RoomController::addRoom() {
-    Room room; 
-    cin >> room; 
-    roomList.add(room); 
 
-    ofstream file("rooms.csv", ios::app);
-    if (!file.is_open()) {
+void RoomController::addRoom()
+{
+    Room room;
+    cin >> room;
+    roomList.add(room);
+
+    ofstream file("data/rooms.csv", ios::app);
+    if (!file.is_open())
+    {
         cerr << "Error opening file for writing!" << endl;
         return;
     }
@@ -28,116 +29,144 @@ void RoomController::addRoom() {
     view.displayMessage("Room added successfully and saved to rooms.csv!");
 }
 
-
-void RoomController::deleteRoom() {
+void RoomController::deleteRoom()
+{
     int roomNumber;
     cout << "Enter room number to delete: ";
     cin >> roomNumber;
 
-    Room* room = roomList.findRoomNumber(roomNumber);
-    if (room) {
+    Room *room = roomList.findRoomNumber(roomNumber);
+    if (room)
+    {
         roomList.remove(*room);
-
-        ofstream file("rooms.csv");
-        if (!file.is_open()) {
-            cerr << "Error opening file for writing!" << endl;
-            return;
-        }
-
-        for (const auto& r : roomList) {
-            file << r.getRoomNumber() << ","
-                 << r.getRoomType() << ","
-                 << r.getIsAvailable() << ","
-                 << r.getRoomPrice() << "\n";
-        }
-        file.close();
+        updateCSV();
         cout << "Room deleted successfully!" << endl;
-    } else {
+    }
+    else
+    {
         cout << "Room not found!" << endl;
     }
 }
 
-void RoomController::updateRoom() {
+void RoomController::updateRoom()
+{
     int roomNumber;
     cout << "Enter room number to update: ";
     cin >> roomNumber;
+    bool found = false;
 
-    Room* room = roomList.findRoomNumber(roomNumber);
-    if (room) {
-        cout << "Current room details:" << endl;
-        view.displayRoomDetails(*room);
+    for (auto &room : roomList)
+    {
+        if (room.getRoomNumber() == roomNumber)
+        {
+            cout << "Current room details:" << endl;
+            view.displayRoomDetails(room);
 
-        cout << "Enter new details for the room:" << endl;
-        cin >> *room; 
+            cout << "Enter new details for the room:" << endl;
+            cout << "Enter room type: (1 for small room , 2 for medium room, or 3 large room): ";
+            int roomType;
+            cin >> roomType;
+            room.setRoomType(roomType);
+            cout << "Enter room availability (true for available, false for unavailable): ";
+            bool isAvailable;
+            cin >> isAvailable;
+            room.setAvailability(isAvailable);
+            cout << "Enter room price: ";
+            double roomPrice;
+            cin >> roomPrice;
+            room.setRoomPrice(roomPrice);
 
-        ofstream file("rooms.csv");
-        if (!file.is_open()) {
-            cerr << "Error opening file for writing!" << endl;
-            return;
+            found = true;
+            updateCSV();
+            cout << "Room updated successfully!" << endl;
         }
-
-        for (const auto& r : roomList) {
-            file << r.getRoomNumber() << ","
-                 << r.getRoomType() << ","
-                 << r.getIsAvailable() << ","
-                 << r.getRoomPrice() << "\n";
-        }
-        file.close();
-        cout << "Room updated successfully!" << endl;
-    } else {
+    }
+    if (!found)
+    {
         cout << "Room not found!" << endl;
     }
 }
 
-
-void RoomController::searchRoom() {
-    int roomNumber;
-    cout << "Enter room number to search: ";
-    cin >> roomNumber;
-
-    Room* room = roomList.findRoomNumber(roomNumber);
-    if (room) {
+void RoomController::searchRoom(int roomNumber)
+{
+    Room *room = roomList.findRoomNumber(roomNumber);
+    if (room)
+    {
         view.displayRoomDetails(*room);
-    } else {
+    }
+    else
+    {
         cout << "Room not found!" << endl;
     }
 }
 
-
-void RoomController::bookRoom(int roomNumber) {
-    Room* room = roomList.findRoomNumber(roomNumber);
-    if (room && room->getIsAvailable()) {
+void RoomController::bookRoom(int roomNumber)
+{
+    Room *room = roomList.findRoomNumber(roomNumber);
+    if (room && room->getIsAvailable())
+    {
         room->setAvailability(false);
+        updateCSV();
         view.displayMessage("Room booked successfully!");
-    } else {
+    }
+    else
+    {
         view.displayMessage("Room is unavailable!");
     }
 }
 
-void RoomController::cancelRoomBooking(int roomNumber) {
-    Room* room = roomList.findRoomNumber(roomNumber);
-    if (room && !room->getIsAvailable()) {
+void RoomController::cancelRoomBooking(int roomNumber)
+{
+    Room *room = roomList.findRoomNumber(roomNumber);
+    if (room && !room->getIsAvailable())
+    {
         room->setAvailability(true);
+        updateCSV();
         view.displayMessage("Booking canceled successfully!");
-    } else {
+    }
+    else
+    {
         view.displayMessage("Room is already available!");
     }
 }
 
-void RoomController::roomStatistics() {
+void RoomController::roomStatistics()
+{
     cout << "---------------------------- Room Statistics ----------------------------" << endl;
-    cout << "| Room Number | Room Type | Status     | Room Price |" << endl;
-    cout << "--------------------------------------------------------------------------" << endl;
+    cout << left
+         << "| " << setw(15) << "Room Number"
+         << "| " << setw(15) << "Room Type"
+         << "| " << setw(15) << "Status"
+         << "| " << setw(15) << "Room Price"
+         << "|" << endl;
 
-    for (const auto& room : roomList) {
-        cout << "| " << room.getRoomNumber() << "        | " << room.getRoomType()
-             << "         | " << (room.getIsAvailable() ? "Available" : "Booked")
-             << "   | " << room.getRoomPrice() << "       |" << endl;
+    for (const auto &room : roomList)
+    {
+        cout << left
+             << "| " << setw(15) << room.getRoomNumber()
+             << "| " << setw(15) << (room.getRoomType() == 1 ? "Small room " : room.getRoomType() == 2 ? "Medium room "
+                                                                                                       : "Large room ")
+             << "| " << setw(15) << (room.getIsAvailable() ? "Available" : "Booked")
+             << "| " << setw(15) << room.getRoomPrice()
+             << "|" << endl;
     }
-
-    cout << "--------------------------------------------------------------------------" << endl;
 }
 
-void RoomController::execute() {
-    // Placeholder for additional functionality.
+void RoomController::updateCSV()
+{
+    ofstream file("data/rooms.csv", ios::out);
+    if (!file.is_open())
+    {
+        cerr << "Error opening file for writing!" << endl;
+        return;
+    }
+    file << "roomNumber,roomType,isAvailable,roomPrice\n";
+    for (const auto &r : roomList)
+    {
+        file << r.getRoomNumber() << ","
+             << r.getRoomType() << ","
+             << r.getIsAvailable() << ","
+             << r.getRoomPrice() << "\n";
+    }
+    file.close();
 }

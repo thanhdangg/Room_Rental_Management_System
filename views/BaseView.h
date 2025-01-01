@@ -4,10 +4,11 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
 class BaseView {
 public:
-    virtual void displayMessage(const std::string& message) {
-        std::cout << message << std::endl;
+    virtual void displayMessage(const string& message) {
+        cout << message << endl;
     }
 
     virtual ~BaseView() = default;

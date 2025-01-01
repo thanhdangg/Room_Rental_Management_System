@@ -2,8 +2,8 @@
 
 User::User() : role(0) {}
 
-User::User(const string& email, const string& password, int role) 
-    : email(email), password(password), role(role) {}
+User::User(int userId, const string& email, const string& password, int role) 
+    : userId(userId), email(email), password(password), role(role) {}
 
 string User::getEmail() const {
     return email;
@@ -17,6 +17,11 @@ int User::getRole() const {
     return role;
 }
 
+int User::getUserId() const
+{
+    return userId;
+}
+
 void User::setEmail(const string& email) {
     this->email = email;
 }
@@ -27,6 +32,11 @@ void User::setPassword(const string& password) {
 
 void User::setRole(int role) {
     this->role = role;
+}
+
+void User::setUserId(int userId)
+{
+    this->userId = userId;
 }
 
 bool User::validateLogin(const string& username, const string& password) const {
@@ -45,15 +55,17 @@ vector<User> User::loadUsersFromCSV(const string& filename) {
 
     while (getline(file, line)) {
         stringstream ss(line);
-        string email, password, roleStr;
-        int role;
+        string email, password, roleStr, userIdStr;
+        int role, userId;
 
+        getline(ss, userIdStr, ',');
         getline(ss, email, ',');
         getline(ss, password, ',');
         getline(ss, roleStr, ',');
         role = stoi(roleStr);
+        userId = stoi(userIdStr);
 
-        users.push_back(User(email, password, role));
+        users.push_back(User(userId, email, password, role));
     }
 
     file.close();

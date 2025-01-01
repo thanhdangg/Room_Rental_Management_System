@@ -1,6 +1,8 @@
 #include "Contract.h"
 
-Contract::Contract(int contractID, int tenantID, int roomNumber, time_t startDate, time_t endDate, const std::string& status)
+Contract::Contract() : contractID(0), tenantID(0), roomNumber(0), startDate(""), endDate(""), status(0) {}
+
+Contract::Contract(int contractID, int tenantID, int roomNumber, string startDate, string endDate, int status)
     : contractID(contractID), tenantID(tenantID), roomNumber(roomNumber), startDate(startDate), endDate(endDate), status(status) {}
 
 int Contract::getContractID() const {
@@ -15,15 +17,15 @@ int Contract::getRoomNumber() const {
     return roomNumber;
 }
 
-time_t Contract::getStartDate() const {
+string Contract::getStartDate() const {
     return startDate;
 }
 
-time_t Contract::getEndDate() const {
+string Contract::getEndDate() const {
     return endDate;
 }
 
-std::string Contract::getStatus() const {
+int Contract::getStatus() const {
     return status;
 }
 
@@ -39,45 +41,44 @@ void Contract::setRoomNumber(int roomNumber) {
     this->roomNumber = roomNumber;
 }
 
-void Contract::setStartDate(time_t startDate) {
+void Contract::setStartDate(string startDate) {
     this->startDate = startDate;
 }
 
-void Contract::setEndDate(time_t endDate) {
+void Contract::setEndDate(string endDate) {
     this->endDate = endDate;
 }
 
-void Contract::setStatus(const std::string& status) {
+void Contract::setStatus(int status) {
     this->status = status;
 }
 
-std::ostream& operator<<(std::ostream& os, const Contract& contract) {
+ostream& operator<<(ostream& os, const Contract& contract) {
     os << "Contract ID: " << contract.contractID << "\n"
        << "Tenant ID: " << contract.tenantID << "\n"
        << "Room Number: " << contract.roomNumber << "\n"
-       << "Start Date: " << ctime(&contract.startDate)
-       << "End Date: " << ctime(&contract.endDate)
-       << "Status: " << contract.status << "\n";
+       << "Start Date: " << contract.startDate << "\n"
+       << "End Date: " << contract.endDate << "\n"
+       << "Status: " << (contract.status ? "Active" : "Expired") << "\n";
     return os;
 }
 
-std::istream& operator>>(std::istream& is, Contract& contract) {
-    std::cout << "Enter Contract ID: ";
+istream& operator>>(istream& is, Contract& contract) {
+    cout << "Enter Contract ID: ";
     is >> contract.contractID;
-    std::cout << "Enter Tenant ID: ";
+    cout << "Enter Tenant ID: ";
     is >> contract.tenantID;
-    std::cout << "Enter Room Number: ";
+    cout << "Enter Room Number: ";
     is >> contract.roomNumber;
 
-    std::cout << "Enter Start Date (as timestamp): ";
+    cout << "Enter Start Date (yyyy-mm-dd): ";
     is >> contract.startDate;
 
-    std::cout << "Enter End Date (as timestamp): ";
+    cout << "Enter End Date (yyyy-mm-dd): ";
     is >> contract.endDate;
 
-    std::cout << "Enter Status: ";
-    is.ignore(); 
-    std::getline(is, contract.status);
+    cout << "Enter Status: (1 for Active, 0 for Expired): ";
+    is >> contract.status;
 
     return is;
 }

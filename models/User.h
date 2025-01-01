@@ -12,21 +12,24 @@ using namespace std;
 
 class User {
 private:
+    int userId;
     string email;
     string password; 
-    int role; // Role can be Owner or Tenant
+    int role; 
 
 public:
     User();
-    User(const string& email, const string& password, int role);
+    User(int userId, const string& email, const string& password, int role);
 
     string getEmail() const;
     string getPassword() const;
     int getRole() const;
+    int getUserId() const;
 
     void setEmail(const string& email);
     void setPassword(const string& password);
     void setRole(int role);
+    void setUserId(int userId);
 
     static vector<User> loadUsersFromCSV(const string& filename);
     bool validateLogin(const string& username, const string& password) const;

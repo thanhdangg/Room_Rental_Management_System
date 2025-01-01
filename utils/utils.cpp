@@ -72,7 +72,7 @@ string hashPassword(const string &password)
     return os.str();
 }
 
-bool login(const LinkedList<User> &userList, int &role)
+bool login(const LinkedList<User> &userList, int &role, int &userId)
 {
     string email, password;
     int try_count = 5;
@@ -93,6 +93,7 @@ bool login(const LinkedList<User> &userList, int &role)
             if (it->getEmail() == email && it->getPassword() == hashPassword(password))
             {
                 role = it->getRole();
+                userId = it->getUserId();
                 cout << "Login successful!" << endl;
                 return true;
             }
@@ -190,10 +191,12 @@ void displayTenantMenu()
     system("cls");
     cout << "========================= Tenant Menu =========================" << endl;
     cout << "1. Display Invoice Details" << endl;
-    cout << "2. Edit Invoice" << endl;
-    cout << "3. Search Invoice" << endl;
-    cout << "4. Process Invoice Payment" << endl;
-    cout << "5. Logout" << endl;
+    cout << "2. Search Invoice" << endl;
+    cout << "3. Display Contract Details" << endl;
+    cout << "4. Display Room  Info" << endl;
+    cout << "5. Display User Info" << endl;
+    cout << "6. Update User Info" << endl;
+    cout << "7. Back to Main Menu" << endl;
     cout << "===============================================================" << endl;
     cout << "Enter your choice: ";
 }
@@ -207,6 +210,7 @@ void loadRoomsFromCSV(RoomLinkedList &roomList, const string &filename)
         return;
     }
     string line;
+    getline(file, line);
     while (getline(file, line))
     {
         stringstream ss(line);
@@ -234,12 +238,6 @@ void loadRoomsFromCSV(RoomLinkedList &roomList, const string &filename)
         }
     }
     file.close();
-    // cout << "Rooms loaded from " << filename << " successfully!" << endl;
-
-    // for (auto it = roomList.begin(); it != roomList.end(); ++it)
-    // {
-    //     cout << *it << endl;
-    // }
 }
 
 void loadContractsFromCSV(LinkedList<Contract> &contractList, const string &filename)
@@ -256,38 +254,30 @@ void loadContractsFromCSV(LinkedList<Contract> &contractList, const string &file
     while (getline(file, line))
     {
         stringstream ss(line);
-        string contractIDStr, tenantIDStr, roomNumberStr, startDateStr, endDateStr, status;
+        string contractIDStr, tenantIDStr, roomNumberStr, startDateStr, endDateStr, statusStr;
 
         getline(ss, contractIDStr, ',');
         getline(ss, tenantIDStr, ',');
         getline(ss, roomNumberStr, ',');
         getline(ss, startDateStr, ',');
         getline(ss, endDateStr, ',');
-        getline(ss, status, ',');
+        getline(ss, statusStr, ',');
 
         contractIDStr = trim(contractIDStr);
         tenantIDStr = trim(tenantIDStr);
         roomNumberStr = trim(roomNumberStr);
         startDateStr = trim(startDateStr);
         endDateStr = trim(endDateStr);
-        status = trim(status);
+        statusStr = trim(statusStr);
 
         try
         {
             int contractID = stoi(contractIDStr);
             int tenantID = stoi(tenantIDStr);
             int roomNumber = stoi(roomNumberStr);
+            int status = stoi(statusStr);
 
-            tm startDate = {}, endDate = {};
-            if (!parseDate(startDateStr, startDate) || !parseDate(endDateStr, endDate))
-            {
-                throw invalid_argument("Invalid date format");
-            }
-
-            time_t start = mktime(&startDate);
-            time_t end = mktime(&endDate);
-
-            Contract contract(contractID, tenantID, roomNumber, start, end, status);
+            Contract contract(contractID, tenantID, roomNumber, startDateStr, endDateStr, status);
             contractList.add(contract);
         }
         catch (const exception &e)
@@ -297,10 +287,6 @@ void loadContractsFromCSV(LinkedList<Contract> &contractList, const string &file
     }
 
     file.close();
-    // cout << "Contracts loaded from " << filename << " successfully! Count: " << contractList.size() << endl;
-    // for (auto it = contractList.begin(); it!= contractList.end(); ++it) {
-    //     cout << *it << endl;
-    // }
 }
 
 void loadInvoicesFromCSV(LinkedList<Invoice> &invoiceList, const string &filename)
@@ -448,9 +434,9 @@ void loadUsersFromCSV(LinkedList<User> &userList, const string &filename)
     while (getline(file, line))
     {
         stringstream ss(line);
-        string email, password, roleStr;
-        int role;
-
+        string email, password, roleStr, userIDStr;
+        int role, userID;
+        getline(ss, userIDStr, ',');
         getline(ss, email, ',');
         getline(ss, password, ',');
         getline(ss, roleStr, ',');
@@ -458,17 +444,19 @@ void loadUsersFromCSV(LinkedList<User> &userList, const string &filename)
         email = trim(email);
         password = trim(password);
         roleStr = trim(roleStr);
+        userIDStr = trim(userIDStr);
 
         try
         {
             role = (roleStr == "Admin") ? 1 : (roleStr == "User" ? 2 : 0);
+            userID = stoi(userIDStr);
 
             if (role == 0)
             {
                 throw invalid_argument("Invalid role value: " + roleStr);
             }
 
-            User user(email, password, role);
+            User user(userID, email, password, role);
             userList.add(user);
         }
         catch (const exception &e)

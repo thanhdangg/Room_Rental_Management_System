@@ -8,7 +8,8 @@ void TenantController::addTenant() {
     Tenant tenant;
     cin >> tenant;
     tenantList.add(tenant);
-    ofstream file("tenants.csv", ios::app);
+
+    ofstream file("data/tenants.csv", ios::app);
     if (!file.is_open())
     {
         cerr << "Error opening file for writing!" << endl;
@@ -17,9 +18,11 @@ void TenantController::addTenant() {
 
     file << tenant.getId()
          << "," << tenant.getName()
+         << "," << tenant.getAddress()
          << "," << tenant.getPhone()
          << "," << tenant.getEmail()
-         << "," << tenant.getAddress()
+         << "," << tenant.getSex()
+         << "," << tenant.getDateOfBirth()
          << "\n";
 
     file.close();
@@ -27,26 +30,40 @@ void TenantController::addTenant() {
 
 }
 
-void TenantController::updateTenant() {
-    int id;
-    cout << "Enter tenant ID to update: ";
-    cin >> id;
-    auto tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
+void TenantController::updateTenant(int id) {
 
-    if (tenant) {
-        string name, phone;
-        cout << "Enter new name: ";
-        cin.ignore();
-        getline(cin, name);
-        cout << "Enter new phone: ";
-        cin >> phone;
-
-        tenant->setName(name);
-        tenant->setPhone(phone);
-        cout << "Tenant updated successfully!" << endl;
-    } else {
-        cout << "Tenant not found!" << endl;
+    for (auto& tenant : tenantList) {
+        if (tenant.getId() == id) {
+            cout << "Current tenant details:" << endl;
+            cout << tenant;
+            cout << "Enter new tenant details:" << endl;
+            cin >> tenant;
+            updateCSV();
+            cout << "Tenant updated successfully!" << endl;
+            return;
+        }
     }
+}
+
+void TenantController::updateCSV()
+{
+    ofstream file("data/tenants.csv");
+    if (!file.is_open()) {
+        cerr << "Error opening file for writing!" << endl;
+        return ;
+    }
+
+    for (const auto& tenant : tenantList) {
+        file << tenant.getId() << ","
+             << tenant.getName() << ","
+             << tenant.getAddress() << ","
+             << tenant.getPhone() << ","
+             << tenant.getEmail() << ","
+             << tenant.getSex() << ","
+             << tenant.getDateOfBirth() << "\n";
+    }
+
+    file.close();
 }
 
 void TenantController::deleteTenant() {
@@ -54,18 +71,18 @@ void TenantController::deleteTenant() {
     cout << "Enter tenant ID to delete: ";
     cin >> id;
 
-    Tenant* tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
-    if (tenant && tenantList.remove(*tenant)) {
-        cout << "Tenant deleted successfully!" << endl;
-    } else {
-        cout << "Tenant not found!" << endl;
+    for (auto& tenant : tenantList) {
+        if (tenant.getId() == id) {
+            tenantList.remove(tenant);
+            updateCSV();
+            cout << "Tenant deleted successfully!" << endl;
+            return;
+        }
     }
 }
 
-void TenantController::searchTenant() {
-    int id;
-    cout << "Enter tenant ID to search: ";
-    cin >> id;
+void TenantController::searchTenant(int id) {
+
     auto tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
     if (tenant) {
         cout << *tenant;
@@ -81,7 +98,6 @@ void TenantController::tenantStatistics() {
          << "| " << left << setw(15) << "Phone Number"
          << "| " << left << setw(25) << "Email"
          << "| " << left << setw(30) << "Address" << " |" << endl;
-    cout << "-------------------------------------------------------------------------" << endl;
 
     for (const auto& tenant : tenantList) {
         cout << "| " << left << setw(15) << tenant.getId() 

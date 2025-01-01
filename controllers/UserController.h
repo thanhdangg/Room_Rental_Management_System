@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 
+using namespace std;
+
 class UserController : public BaseController {
 private:
     LinkedList<User>& users;
@@ -16,10 +18,10 @@ private:
 public:
     UserController(LinkedList<User>& users, const UserView& userView);
 
-    void login(const std::string& username, const std::string& password);
-    void changePassword(const std::string& email, const std::string& oldPassword, const std::string& newPassword);
-    void deleteAccount(const std::string& email);
-    void execute() override;
+    void login(const string& username, const string& password);
+    void changePassword(const string& email, const string& oldPassword, const string& newPassword);
+    void deleteAccount(const string& email);
+    void updateCSV() override;
 };
 
 #endif // USERCONTROLLER_H

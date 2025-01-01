@@ -3,12 +3,10 @@
 #include <sstream>
 #include <unordered_map>
 #include <algorithm>
-#include <ctime>
 #include <iomanip>
 #include <conio.h>
 #include <openssl/sha.h>
 #include <string>
-
 #include "models/Landlord.h"
 #include "models/Tenant.h"
 #include "models/Room.h"
@@ -40,11 +38,11 @@ int main()
     LinkedList<Contract> contractList;
     LinkedList<User> userList;
 
-    loadContractsFromCSV(contractList, "data/contract.csv");
-    loadInvoicesFromCSV(invoiceList, "data/invoice.csv");
+    loadContractsFromCSV(contractList, "data/contracts.csv");
+    loadInvoicesFromCSV(invoiceList, "data/invoices.csv");
     loadRoomsFromCSV(roomList, "data/rooms.csv");
-    loadTenantsFromCSV(tenantList, "data/tenant.csv");
-    loadUsersFromCSV(userList, "data/user.csv");
+    loadTenantsFromCSV(tenantList, "data/tenants.csv");
+    loadUsersFromCSV(userList, "data/users.csv");
 
     RoomController roomController(roomList, RoomView());
     InvoiceController invoiceController(invoiceList, InvoiceView());
@@ -54,15 +52,17 @@ int main()
 
     int choice;
     int userRole;
+    int userId;
 
     logProjectInfo();
 
     while (true)
     {
-        if (!login(userList, userRole))
+        if (!login(userList, userRole, userId))
         {
             return 1;
         }
+        system("pause");
 
         if (userRole == 1)
         {
@@ -99,7 +99,10 @@ int main()
                             roomController.deleteRoom();
                             break;
                         case 4:
-                            roomController.searchRoom();
+                            int roomNumber;
+                            cout << "Enter room number to search: ";
+                            cin >> roomNumber;
+                            roomController.searchRoom(roomNumber);
                             break;
                         case 5:
                             roomController.roomStatistics();
@@ -108,6 +111,7 @@ int main()
                             cout << "Invalid choice. Please try again." << endl;
                             break;
                         }
+                        system("pause");
                     }
                     break;
                 case 2:
@@ -115,6 +119,8 @@ int main()
                     {
                         displayTenantManagementMenu();
                         cin >> choice;
+                        int id;
+
                         if (choice == 6)
                         {
                             break; // Back to Main Menu
@@ -125,13 +131,16 @@ int main()
                             tenantController.addTenant();
                             break;
                         case 2:
-                            tenantController.updateTenant();
+                            cout << "Enter tenant ID to update: ";
+                            tenantController.updateTenant(id);
                             break;
                         case 3:
                             tenantController.deleteTenant();
                             break;
                         case 4:
-                            tenantController.searchTenant();
+                            cout << "Enter tenant ID to search: ";
+                            cin >> id;
+                            tenantController.searchTenant(id);
                             break;
                         case 5:
                             tenantController.tenantStatistics();
@@ -140,6 +149,7 @@ int main()
                             cout << "Invalid choice. Please try again." << endl;
                             break;
                         }
+                        system("pause");
                     }
                     break;
                 case 3:
@@ -163,7 +173,10 @@ int main()
                             invoiceController.deleteInvoice();
                             break;
                         case 4:
-                            invoiceController.searchInvoice();
+                            int roomNumber;
+                            cout << "Enter room number to search: ";
+                            cin >> roomNumber;
+                            invoiceController.searchInvoice(roomNumber);
                             break;
                         case 5:
                             invoiceController.invoiceStatistics();
@@ -175,6 +188,7 @@ int main()
                             cout << "Invalid choice. Please try again." << endl;
                             break;
                         }
+                        system("pause");
                     }
                     break;
                 case 4:
@@ -198,7 +212,10 @@ int main()
                             contractController.endContract();
                             break;
                         case 4:
-                            contractController.searchContract();
+                            int userID;
+                            cout << "Enter userID to search: ";
+                            cin >> userID;
+                            contractController.searchContract(userID);
                             break;
                         case 5:
                             contractController.contractStatistics();
@@ -207,6 +224,7 @@ int main()
                             cout << "Invalid choice. Please try again." << endl;
                             break;
                         }
+                        system("pause");
                     }
                     break;
                 default:
@@ -217,12 +235,15 @@ int main()
         }
         else if (userRole == 2)
         {
+
             while (true)
             {
+                int roomTenant;
+                roomTenant = contractController.getRoomByTenant(userId);
                 displayTenantMenu();
                 cin >> choice;
 
-                if (choice == 5)
+                if (choice == 7)
                 {
                     break; // Exit
                 }
@@ -230,21 +251,28 @@ int main()
                 switch (choice)
                 {
                 case 1:
-                    invoiceController.displayInvoiceDetails();
+                    invoiceController.displayInvoicesByTenant(userId);
                     break;
                 case 2:
-                    invoiceController.editInvoice();
+                    invoiceController.searchInvoice(roomTenant);
                     break;
                 case 3:
-                    // tenantController.displayTenantDetails();
+                    contractController.searchContract(userId);
                     break;
                 case 4:
-                    tenantController.updateTenant();
+                    roomController.searchRoom(roomTenant);
+                    break;
+                case 5:
+                    tenantController.searchTenant(userId);
+                    break;
+                case 6:
+                    tenantController.updateTenant(userId);
                     break;
                 default:
                     cout << "Invalid choice! Please try again." << endl;
                 }
                 cout << endl;
+                system("pause");
             }
         }
         else

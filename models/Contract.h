@@ -3,7 +3,6 @@
 
 #include <string>
 #include <iostream>
-#include <ctime> 
 
 using namespace std;
 class Contract {
@@ -11,26 +10,27 @@ private:
     int contractID;      
     int tenantID;        
     int roomNumber;      
-    time_t startDate;    
-    time_t endDate;     
-    string status;  
+    string startDate;    
+    string endDate;     
+    int status;  
 
 public:
-    Contract(int contractID, int tenantID, int roomNumber, time_t startDate, time_t endDate, const std::string& status);
+    Contract();
+    Contract(int contractID, int tenantID, int roomNumber, string startDate, string endDate, int status);
 
     int getContractID() const;
     int getTenantID() const;
     int getRoomNumber() const;
-    time_t getStartDate() const;
-    time_t getEndDate() const;
-    string getStatus() const;
+    string getStartDate() const;
+    string getEndDate() const;
+    int getStatus() const;
 
     void setContractID(int contractID);
     void setTenantID(int tenantID);
     void setRoomNumber(int roomNumber);
-    void setStartDate(time_t startDate);
-    void setEndDate(time_t endDate);
-    void setStatus(const string& status);
+    void setStartDate(string startDate);
+    void setEndDate(string endDate);
+    void setStatus(int status);
 
     friend ostream& operator<<(ostream& os, const Contract& contract);
     friend istream& operator>>(istream& is, Contract& contract);     

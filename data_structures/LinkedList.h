@@ -17,13 +17,15 @@ public:
     void add(const T &item);
     bool remove(const T &item);
     T* find(function<bool(const T&)> predicate);
+    T& back();
+
     typename vector<T>::iterator begin();
     typename vector<T>::iterator end();
     typename vector<T>::const_iterator begin() const;
     typename vector<T>::const_iterator end() const;
-    int size() const; 
 
-
+    int size() const;
+    void showList();
 
 private:
     struct Node {
@@ -102,6 +104,21 @@ T* LinkedList<T>::find(function<bool(const T&)> predicate) {
 }
 
 template <typename T>
+inline T &LinkedList<T>::back()
+{
+        if (!head) {
+        throw runtime_error("List is empty, no last element available.");
+    }
+
+    Node* current = head;
+    while (current->next) {
+        current = current->next;
+    }
+
+    return current->data;
+}
+
+template <typename T>
 typename vector<T>::iterator LinkedList<T>::begin() {
     return data.begin();
 }
@@ -124,6 +141,16 @@ typename vector<T>::const_iterator LinkedList<T>::end() const {
 template <typename T>
 int LinkedList<T>::size() const {
     return listSize;
+}
+
+template <typename T>
+inline void LinkedList<T>::showList()
+{
+    Node* current = head;
+    while (current) {
+        cout << current->data << endl;
+        current = current->next;
+    }
 }
 
 class RoomLinkedList : public LinkedList<Room> {

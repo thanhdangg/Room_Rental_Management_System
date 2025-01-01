@@ -3,23 +3,23 @@
 
 Tenant::Tenant() : Person(), id(0), sex(""), email(""), dateOfBirth("") {}
 
-Tenant::Tenant(int id, const std::string& name, const std::string& sex, const std::string& dateOfBirth,
-               const std::string& email, const std::string& phone, const std::string& address)
+Tenant::Tenant(int id, const string& name, const string& sex, const string& dateOfBirth,
+               const string& email, const string& phone, const string& address)
     : Person(name, address, phone), id(id), sex(sex), email(email), dateOfBirth(dateOfBirth) {}
 
 int Tenant::getId() const {
     return id;
 }
 
-std::string Tenant::getEmail() const {
+string Tenant::getEmail() const {
     return email;
 }
 
-std::string Tenant::getSex() const {
+string Tenant::getSex() const {
     return sex;
 }
 
-std::string Tenant::getDateOfBirth() const {
+string Tenant::getDateOfBirth() const {
     return dateOfBirth;
 }
 
@@ -27,29 +27,54 @@ void Tenant::setId(int id) {
     this->id = id;
 }
 
-void Tenant::setEmail(const std::string& email) {
+void Tenant::setEmail(const string& email) {
     this->email = email;
 }
 
-void Tenant::setSex(const std::string& sex) {
+void Tenant::setSex(const string& sex) {
     this->sex = sex;
 }
 
-void Tenant::setDateOfBirth(const std::string& dateOfBirth) {
+void Tenant::setDateOfBirth(const string& dateOfBirth) {
     this->dateOfBirth = dateOfBirth;
 }
 
-std::istream& operator>>(std::istream& in, Tenant& tenant) {
-    std::getline(in, tenant.email);
+istream& operator>>(istream& in, Tenant& tenant) {
+    string name, sex, dateOfBirth, email, phone, address;
+    int ID;
+    cout << "Enter ID: ";
+    in >> ID;
+    cout << "Enter Name: ";
+    in.ignore();
+    getline(in, name);
+    tenant.setName(name);
+    cout << "Enter Sex: ";
+    getline(in, sex);
+    tenant.setSex(sex);
+    cout << "Enter Date of Birth (YYYY-MM-DD): ";
+    getline(in, dateOfBirth);
+    tenant.setDateOfBirth(dateOfBirth);
+    cout << "Enter Email: ";
+    in >> email;
+    tenant.setEmail(email);
+    cout << "Enter Phone: ";
+    in >> phone;
+    tenant.setPhone(phone);
+    cout << "Enter Address: ";
+    in.ignore();
+    getline(in, address);
+    tenant.setAddress(address);
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const Tenant& tenant) {
-    out << static_cast<const Person&>(tenant); 
-    out << "ID: " << tenant.id << std::endl;
-    out << "Sex: " << tenant.sex << std::endl;
-    out << "Date of Birth: " << tenant.dateOfBirth << std::endl;
-    out << "Email: " << tenant.email << std::endl;
+ostream& operator<<(ostream& out, const Tenant& tenant) {
+    out << "ID: " << tenant.getId() << endl;
+    out << "Name: " << tenant.getName() << endl;
+    out << "Sex: " << tenant.getSex() << endl;
+    out << "Date of Birth: " << tenant.getDateOfBirth() << endl;
+    out << "Email: " << tenant.getEmail() << endl;
+    out << "Phone: " << tenant.getPhone() << endl;
+    out << "Address: " << tenant.getAddress() << endl;
     return out;
 }
 

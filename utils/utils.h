@@ -24,7 +24,6 @@
 #include <sstream>
 #include <unordered_map>
 #include <algorithm>
-#include <ctime>
 #include <iomanip>
 #include <conio.h>
 #include <openssl/sha.h>
@@ -36,7 +35,7 @@ using namespace std;
 string trim(const string& str);
 string getHiddenPassword();
 string hashPassword(const string& password);
-bool login(const LinkedList<User>& userList, int& userRole);
+bool login(const LinkedList<User>& userList, int& userRole, int& userId);
 
 // Menu display functions
 void displayMainMenu();
