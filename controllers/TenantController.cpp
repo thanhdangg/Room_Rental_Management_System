@@ -1,4 +1,5 @@
 #include "TenantController.h"
+#include "../utils/utils.h"
 
 using namespace std;
 
@@ -67,9 +68,8 @@ void TenantController::updateCSV()
 }
 
 void TenantController::deleteTenant() {
-    int id;
-    cout << "Enter tenant ID to delete: ";
-    cin >> id;
+
+    int id = inputNumber("Enter tenant ID to delete");
 
     for (auto& tenant : tenantList) {
         if (tenant.getId() == id) {
@@ -82,7 +82,6 @@ void TenantController::deleteTenant() {
 }
 
 void TenantController::searchTenant(int id) {
-
     auto tenant = tenantList.find([id](const Tenant& t) { return t.getId() == id; });
     if (tenant) {
         cout << *tenant;

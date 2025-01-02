@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <regex> 
+#include <iostream>
+#include <limits>
 
 using namespace std;
 class Contract {

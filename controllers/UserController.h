@@ -19,8 +19,9 @@ public:
     UserController(LinkedList<User>& users, const UserView& userView);
 
     void login(const string& username, const string& password);
-    void changePassword(const string& email, const string& oldPassword, const string& newPassword);
-    void deleteAccount(const string& email);
+    void changePassword(int userId);
+    void deleteAccount(int userId);
+    void addAccount();
     void updateCSV() override;
 };
 

@@ -1,5 +1,5 @@
 #include "Invoice.h"
-
+#include "../utils/utils.h"
 Invoice::Invoice() : invoiceId(0), roomNumber(0), tenantID(0), oldElectricIndex(0), newElectricIndex(0),
                      oldWaterIndex(0), newWaterIndex(0), surcharge(0.0), month(0), year(0), total(0.0), isCharged(false) {}
 
@@ -111,29 +111,75 @@ void Invoice::calculateTotal() {
     total = (newElectricIndex - oldElectricIndex) * 3.5 + (newWaterIndex - oldWaterIndex) * 7 + surcharge;
 }
 
-istream &operator>>(istream &in, Invoice &invoice) {
-    cout << "Enter Room Number: ";
-    in >> invoice.roomNumber;
-    cout << "Enter Tenant ID: ";
-    in >> invoice.tenantID;
-    cout << "Enter Old Electric Index: ";
-    in >> invoice.oldElectricIndex;
-    cout << "Enter New Electric Index: ";
-    in >> invoice.newElectricIndex;
-    cout << "Enter Old Water Index: ";
-    in >> invoice.oldWaterIndex;
-    cout << "Enter New Water Index: ";
-    in >> invoice.newWaterIndex;
-    cout << "Enter Surcharge: ";
-    in >> invoice.surcharge;
-    cout << "Enter Month: ";
-    in >> invoice.month;
-    cout << "Enter Year: ";
-    in >> invoice.year;
-    cout << "Is charged? (1: Yes, 0: No): ";
-    in >> invoice.isCharged;
-    
+istream& operator>>(istream& in, Invoice& invoice) {
+    invoice.roomNumber = inputNumber("Enter Room Number");
+    if (invoice.roomNumber <= 0) {
+        cout << "Invalid Room Number. Please enter a positive integer." << endl;
+        return in;
+    }
+
+    invoice.tenantID = inputNumber("Enter Tenant ID");
+    if (invoice.tenantID <= 0) {
+        cout << "Invalid Tenant ID. Please enter a positive integer." << endl;
+        return in;
+    }
+
+    invoice.oldElectricIndex = inputNumber("Enter Old Electric Index");
+    if (invoice.oldElectricIndex < 0) {
+        cout << "Invalid Electric Index. Please enter a non-negative integer." << endl;
+        return in;
+    }
+
+    invoice.newElectricIndex = inputNumber("Enter New Electric Index");
+    if (invoice.newElectricIndex < 0) {
+        cout << "Invalid Electric Index. Please enter a non-negative integer." << endl;
+        return in;
+    }
+
+    invoice.oldWaterIndex = inputNumber("Enter Old Water Index");
+    if (invoice.oldWaterIndex < 0) {
+        cout << "Invalid Water Index. Please enter a non-negative integer." << endl;
+        return in;
+    }
+
+    invoice.newWaterIndex = inputNumber("Enter New Water Index");
+    if (invoice.newWaterIndex < 0) {
+        cout << "Invalid Water Index. Please enter a non-negative integer." << endl;
+        return in;
+    }
+
+    invoice.surcharge = inputNumber("Enter Surcharge");
+    if (invoice.surcharge < 0) {
+        cout << "Invalid Surcharge. Please enter a non-negative value." << endl;
+        return in;
+    }
+
+    invoice.month = inputNumber("Enter Month");
+    if (invoice.month < 1 || invoice.month > 12) {
+        cout << "Invalid Month. Please enter a value between 1 and 12." << endl;
+        return in;
+    }
+
+    invoice.year = inputNumber("Enter Year");
+    if (invoice.year <= 0) {
+        cout << "Invalid Year. Please enter a positive integer." << endl;
+        return in;
+    }
+
+    while (true) {
+        cout << "Is charged? (1: Yes, 0: No): ";
+        in >> invoice.isCharged;
+        if (in.fail() || (invoice.isCharged != 0 && invoice.isCharged != 1)) {
+            cout << "Invalid input. Enter 1 for Yes or 0 for No." << endl;
+            in.clear();
+            in.ignore(numeric_limits<streamsize>::max(), '\n');
+        } else {
+            break;
+        }
+    }
+
     invoice.calculateTotal();
+
     return in;
 }
 

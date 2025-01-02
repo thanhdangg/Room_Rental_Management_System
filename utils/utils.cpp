@@ -1,8 +1,6 @@
 #include "utils.h"
 using namespace std;
 
-
-
 string trim(const string &str)
 {
     size_t first = str.find_first_not_of(' ');
@@ -79,7 +77,7 @@ bool login(const LinkedList<User> &userList, int &role, int &userId)
     do
     {
         system("cls");
-        cout << "========================= Login =========================" << endl;  
+        cout << "========================= Login =========================" << endl;
         cout << "Welcome to Room Rental Management System" << endl;
         cout << "Please enter your email and password to login" << endl;
         cout << "Enter email: ";
@@ -103,7 +101,240 @@ bool login(const LinkedList<User> &userList, int &role, int &userId)
     } while (try_count > 0);
     return false;
 }
-void logProjectInfo() {
+bool isNumber(const string &str)
+{
+    if (str.empty())
+        return false;
+    for (char c : str)
+    {
+        if (!isdigit(c))
+            return false;
+    }
+    return true;
+}
+int inputNumber(const string &prompt)
+{
+    string input;
+    while (true)
+    {
+        cout << prompt << ": ";
+        if (cin.peek() == '\n')
+            cin.ignore();
+
+        getline(cin, input);
+        if (isNumber(input))
+        {
+            return stoi(input);
+        }
+        else
+        {
+            cout << "Invalid input! Please enter a number." << endl;
+        }
+    }
+    return 0;
+}
+int inputRoomType()
+{
+    int roomType;
+    while (true)
+    {
+        cout << "Enter room type: (1 for small room, 2 for medium room, or 3 for large room): ";
+        cin >> roomType;
+
+        if (cin.fail() || roomType < 1 || roomType > 3)
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please enter 1, 2, or 3." << endl;
+        }
+        else
+        {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return roomType;
+        }
+    }
+}
+
+double inputDouble(const string &prompt)
+{
+    double value;
+    while (true)
+    {
+        cout << prompt << ": ";
+        cin >> value;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please enter a valid number." << endl;
+        }
+        else
+        {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
+bool inputBool(const string &prompt)
+{
+    string input;
+    while (true)
+    {
+        cout << prompt << ": ";
+        getline(cin, input);
+
+        if (input == "1" || input == "true" || input == "True")
+        {
+            return true;
+        }
+        else if (input == "0" || input == "false" || input == "False")
+        {
+            return false;
+        }
+        else
+        {
+            cout << "Invalid input! Please enter 1 (true) or 0 (false)." << endl;
+        }
+    }
+}
+
+bool isValidDate(const string &date)
+{
+    if (date.size() != 10 || date[4] != '-' || date[7] != '-')
+        return false;
+
+    try
+    {
+        int year = stoi(date.substr(0, 4));
+        int month = stoi(date.substr(5, 2));
+        int day = stoi(date.substr(8, 2));
+
+        if (month < 1 || month > 12 || day < 1 || day > 31)
+            return false;
+
+        vector<int> daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
+        {
+            daysInMonth[1] = 29;
+        }
+
+        return day <= daysInMonth[month - 1];
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+string inputEmail(const string &prompt)
+{
+    string email;
+    while (true)
+    {
+        cout << prompt << ": ";
+        if (cin.peek() == '\n')
+            cin.ignore();
+        getline(cin, email);
+
+        if (isValidEmail(email))
+        {
+            return email;
+        }
+        else
+        {
+            cout << "Invalid email format! Please enter a valid email." << endl;
+        }
+    }
+}
+bool isValidEmail(const string &email)
+{
+    const regex pattern(R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})");
+    return regex_match(email, pattern);
+}
+
+string inputPhone(const string &prompt)
+{
+    string phone;
+    while (true)
+    {
+        cout << prompt << ": ";
+        if (cin.peek() == '\n')
+            cin.ignore();
+        getline(cin, phone);
+
+        if (isValidPhone(phone))
+        {
+            return phone;
+        }
+        else
+        {
+            cout << "Invalid phone number format! Please enter a valid phone number." << endl;
+        }
+    }
+}
+
+bool isValidPhone(const string &phone)
+{
+    const regex pattern(R"(\d{10})");
+    return regex_match(phone, pattern);
+}
+
+string inputString(const string &prompt)
+{
+    string input;
+    cout << prompt << ": ";
+    if (cin.peek() == '\n')
+            cin.ignore();
+
+    getline(cin, input);
+    return input;
+}
+
+string inputDate(const string &prompt)
+{
+    string date;
+    while (true)
+    {
+        cout << prompt << " (yyyy-mm-dd): ";
+        if (cin.peek() == '\n')
+            cin.ignore();
+        cin >> date;
+
+        if (isValidDate(date))
+        {
+            return date;
+        }
+        else
+        {
+            cout << "Invalid date! Please enter a valid date in the format yyyy-mm-dd." << endl;
+        }
+    }
+}
+string inputPassword(const string &prompt)
+{
+    string password;
+    while (true)
+    {
+        cout << prompt << ": ";
+        if (cin.peek() == '\n')
+            cin.ignore();
+        getline(cin, password);
+
+        if (password.length() < 6)
+        {
+            cout << "Password must be at least 6 characters long." << endl;
+        }
+        else
+        {
+            return password;
+        }
+    }
+}
+
+void logProjectInfo()
+{
     cout << " ____________________________________________________________________________" << endl;
     cout << "|                                                                            |" << endl;
     cout << "|                          DO AN CO SO LAP TRINH                             |" << endl;
@@ -112,7 +343,7 @@ void logProjectInfo() {
     cout << "|                  Supervisor: Dr. Nguyen Nang Hung Van                      |" << endl;
     cout << "|              Developer: Nguyen Thanh Dang, Student ID: 102210310           |" << endl;
     cout << "|____________________________________________________________________________|" << endl;
-    cout << endl;       
+    cout << endl;
     system("pause");
 }
 
@@ -124,7 +355,8 @@ void displayMainMenu()
     cout << "2. Tenant Management" << endl;
     cout << "3. Invoice Management" << endl;
     cout << "4. Contract Management" << endl;
-    cout << "5. Logout" << endl;
+    cout << "5. Account Management" << endl;
+    cout << "6. Logout" << endl;
     cout << "=============================================================" << endl;
     cout << "Enter your choice: ";
 }
@@ -185,7 +417,17 @@ void displayContractManagementMenu()
     cout << "=======================================================================" << endl;
     cout << "Enter your choice: ";
 }
-
+void displayAccountManagementMenu()
+{
+    system("cls");
+    cout << "========================= Account Management =========================" << endl;
+    cout << "1. Add Account" << endl;
+    cout << "2. Delete Account" << endl;
+    cout << "3. Change Password" << endl;
+    cout << "4. Back to Main Menu" << endl;
+    cout << "======================================================================" << endl;
+    cout << "Enter your choice: ";
+}
 void displayTenantMenu()
 {
     system("cls");
@@ -196,7 +438,8 @@ void displayTenantMenu()
     cout << "4. Display Room  Info" << endl;
     cout << "5. Display User Info" << endl;
     cout << "6. Update User Info" << endl;
-    cout << "7. Back to Main Menu" << endl;
+    cout << "7. Change Password" << endl;
+    cout << "8. Back to Main Menu" << endl;
     cout << "===============================================================" << endl;
     cout << "Enter your choice: ";
 }

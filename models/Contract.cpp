@@ -1,4 +1,5 @@
 #include "Contract.h"
+#include "../utils/utils.h"
 
 Contract::Contract() : contractID(0), tenantID(0), roomNumber(0), startDate(""), endDate(""), status(0) {}
 
@@ -63,22 +64,35 @@ ostream& operator<<(ostream& os, const Contract& contract) {
     return os;
 }
 
-istream& operator>>(istream& is, Contract& contract) {
-    cout << "Enter Contract ID: ";
-    is >> contract.contractID;
-    cout << "Enter Tenant ID: ";
-    is >> contract.tenantID;
-    cout << "Enter Room Number: ";
-    is >> contract.roomNumber;
+istream& operator>>(istream& is, Contract& contract)
+{
+    contract.tenantID = inputNumber("Enter Tenant ID");
+    if (contract.tenantID <= 0) {
+        cout << "Invalid Tenant ID. Please enter a positive integer." << endl;
+        return is;
+    }
+
+    contract.roomNumber = inputNumber("Enter Room Number");
+    if (contract.roomNumber <= 0) {
+        cout << "Invalid Room Number. Please enter a positive integer." << endl;
+        return is;
+    }
 
     cout << "Enter Start Date (yyyy-mm-dd): ";
-    is >> contract.startDate;
+    while (!(is >> contract.startDate) || !isValidDate(contract.startDate)) {
+        cout << "Invalid Start Date. Please enter a date in the format yyyy-mm-dd: ";
+        is.clear();
+        is.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
 
     cout << "Enter End Date (yyyy-mm-dd): ";
-    is >> contract.endDate;
+    while (!(is >> contract.endDate) || !isValidDate(contract.endDate)) {
+        cout << "Invalid End Date. Please enter a date in the format yyyy-mm-dd: ";
+        is.clear();
+        is.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
 
-    cout << "Enter Status: (1 for Active, 0 for Expired): ";
-    is >> contract.status;
+    contract.status = inputBool("Enter Status (1 for Active, 0 for Expired)");
 
     return is;
 }

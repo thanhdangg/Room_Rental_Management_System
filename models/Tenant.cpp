@@ -1,73 +1,83 @@
 #include "Tenant.h"
 #include <iostream>
+#include <iomanip>
+#include <string>
+#include <regex>
+#include "../utils/utils.h"
 
 Tenant::Tenant() : Person(), id(0), sex(""), email(""), dateOfBirth("") {}
 
-Tenant::Tenant(int id, const string& name, const string& sex, const string& dateOfBirth,
-               const string& email, const string& phone, const string& address)
+Tenant::Tenant(int id, const string &name, const string &sex, const string &dateOfBirth,
+               const string &email, const string &phone, const string &address)
     : Person(name, address, phone), id(id), sex(sex), email(email), dateOfBirth(dateOfBirth) {}
 
-int Tenant::getId() const {
+int Tenant::getId() const
+{
     return id;
 }
 
-string Tenant::getEmail() const {
+string Tenant::getEmail() const
+{
     return email;
 }
 
-string Tenant::getSex() const {
+string Tenant::getSex() const
+{
     return sex;
 }
 
-string Tenant::getDateOfBirth() const {
+string Tenant::getDateOfBirth() const
+{
     return dateOfBirth;
 }
 
-void Tenant::setId(int id) {
+void Tenant::setId(int id)
+{
     this->id = id;
 }
 
-void Tenant::setEmail(const string& email) {
+void Tenant::setEmail(const string &email)
+{
     this->email = email;
 }
 
-void Tenant::setSex(const string& sex) {
+void Tenant::setSex(const string &sex)
+{
     this->sex = sex;
 }
 
-void Tenant::setDateOfBirth(const string& dateOfBirth) {
+void Tenant::setDateOfBirth(const string &dateOfBirth)
+{
     this->dateOfBirth = dateOfBirth;
 }
 
-istream& operator>>(istream& in, Tenant& tenant) {
-    string name, sex, dateOfBirth, email, phone, address;
-    int ID;
-    cout << "Enter ID: ";
-    in >> ID;
-    cout << "Enter Name: ";
-    in.ignore();
-    getline(in, name);
+istream &operator>>(istream &in, Tenant &tenant)
+{
+    tenant.id = inputNumber("Enter ID");
+
+    string name = inputString("Enter Name");
     tenant.setName(name);
-    cout << "Enter Sex: ";
-    getline(in, sex);
+
+    string sex = inputString("Enter Sex");
     tenant.setSex(sex);
-    cout << "Enter Date of Birth (YYYY-MM-DD): ";
-    getline(in, dateOfBirth);
+
+    string dateOfBirth = inputDate("Enter Date of Birth");
     tenant.setDateOfBirth(dateOfBirth);
-    cout << "Enter Email: ";
-    in >> email;
+
+    string email = inputEmail("Enter Email");
     tenant.setEmail(email);
-    cout << "Enter Phone: ";
-    in >> phone;
+
+    string phone = inputPhone("Enter Phone");
     tenant.setPhone(phone);
-    cout << "Enter Address: ";
-    in.ignore();
-    getline(in, address);
+
+    string address = inputString("Enter Address");
     tenant.setAddress(address);
+
     return in;
 }
 
-ostream& operator<<(ostream& out, const Tenant& tenant) {
+ostream &operator<<(ostream &out, const Tenant &tenant)
+{
     out << "ID: " << tenant.getId() << endl;
     out << "Name: " << tenant.getName() << endl;
     out << "Sex: " << tenant.getSex() << endl;
@@ -78,10 +88,12 @@ ostream& operator<<(ostream& out, const Tenant& tenant) {
     return out;
 }
 
-bool Tenant::operator==(const Tenant& other) const {
+bool Tenant::operator==(const Tenant &other) const
+{
     return id == other.id && email == other.email && sex == other.sex && dateOfBirth == other.dateOfBirth;
 }
 
-bool Tenant::operator!=(const Tenant& other) const {
+bool Tenant::operator!=(const Tenant &other) const
+{
     return !(*this == other);
 }

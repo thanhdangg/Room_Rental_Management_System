@@ -1,4 +1,5 @@
 #include "Room.h"
+#include "../utils/utils.h"
 using namespace std;
 Room::Room() {}
 
@@ -24,36 +25,20 @@ void Room::setRoomPrice(double roomPrice) { this->roomPrice = roomPrice; }
 
 istream &operator>>(istream &in, Room &room)
 {
-    cout << "Enter Room Number: ";
-    while (!(in >> room.roomNumber) || room.roomNumber < 0)
-    {
-        cout << "Invalid room number. Please enter a non-negative value: ";
-        in.clear();
-        in.ignore(numeric_limits<streamsize>::max(), '\n');
+    room.roomNumber = inputNumber("Enter Room Number");
+    if (room.roomNumber <= 0) {
+        cout << "Invalid room number. Please enter a positive integer." << endl;
+        return in;
     }
 
-    cout << "Enter Room Type (1 for small room , 2 for medium room, or 3 large room): ";
-    while (!(in >> room.roomType) || (room.roomType < 1 || room.roomType > 3))
-    {
-        cout << "Invalid room type. Please enter a value (1, 2, or 3): ";
-        in.clear();
-        in.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
+    room.roomType = inputRoomType();
 
-    cout << "Enter Room Status (1 for available, 0 for unavailable): ";
-    while (!(in >> room.isAvailable) || (room.isAvailable != 0 && room.isAvailable != 1))
-    {
-        cout << "Invalid status. Enter 1 for available or 0 for unavailable: ";
-        in.clear();
-        in.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
+    room.isAvailable = inputBool("Enter Room Status (1 for available, 0 for unavailable)");
 
-    cout << "Enter Room Price: ";
-    while (!(in >> room.roomPrice) || room.roomPrice < 0)
-    {
-        cout << "Invalid price. Please enter a non-negative value: ";
-        in.clear();
-        in.ignore(numeric_limits<streamsize>::max(), '\n');
+    room.roomPrice = inputDouble("Enter Room Price");
+    if (room.roomPrice < 0) {
+        cout << "Invalid price. Please enter a non-negative value." << endl;
+        return in;
     }
 
     return in;

@@ -1,5 +1,6 @@
 #include "RoomController.h"
 #include <fstream>
+#include "../utils/utils.h"
 
 using namespace std;
 
@@ -10,6 +11,16 @@ void RoomController::addRoom()
 {
     Room room;
     cin >> room;
+
+    for (const auto& existingRoom : roomList)
+    {
+        if (existingRoom.getRoomNumber() == room.getRoomNumber())
+        {
+            cerr << "Room number " << room.getRoomNumber() << " already exists!" << endl;
+            return;
+        }
+    }
+
     roomList.add(room);
 
     ofstream file("data/rooms.csv", ios::app);
@@ -31,10 +42,8 @@ void RoomController::addRoom()
 
 void RoomController::deleteRoom()
 {
-    int roomNumber;
-    cout << "Enter room number to delete: ";
-    cin >> roomNumber;
-
+    int roomNumber = inputNumber("Enter room number to delete");
+    
     Room *room = roomList.findRoomNumber(roomNumber);
     if (room)
     {
@@ -50,9 +59,8 @@ void RoomController::deleteRoom()
 
 void RoomController::updateRoom()
 {
-    int roomNumber;
-    cout << "Enter room number to update: ";
-    cin >> roomNumber;
+    int roomNumber = inputNumber("Enter room number to update");
+
     bool found = false;
 
     for (auto &room : roomList)
@@ -63,17 +71,14 @@ void RoomController::updateRoom()
             view.displayRoomDetails(room);
 
             cout << "Enter new details for the room:" << endl;
-            cout << "Enter room type: (1 for small room , 2 for medium room, or 3 large room): ";
-            int roomType;
-            cin >> roomType;
+
+            int roomType = inputRoomType();
             room.setRoomType(roomType);
-            cout << "Enter room availability (true for available, false for unavailable): ";
-            bool isAvailable;
-            cin >> isAvailable;
+
+            bool isAvailable = inputBool("Enter room availability (1 for available, 0 for unavailable)");
             room.setAvailability(isAvailable);
-            cout << "Enter room price: ";
-            double roomPrice;
-            cin >> roomPrice;
+
+            double roomPrice = inputDouble("Enter room price");
             room.setRoomPrice(roomPrice);
 
             found = true;

@@ -1,4 +1,5 @@
 #include "InvoiceController.h"
+#include "../utils/utils.h"
 
 using namespace std;
 
@@ -100,17 +101,7 @@ void InvoiceController::displayInvoicesByTenant(int tenantID) const
 
 void InvoiceController::editInvoice()
 {
-    int roomNumber;
-    cout << "Enter room number to edit: ";
-    cin >> roomNumber;
-
-    if (cin.fail())
-    {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Invalid input. Please enter a valid room number." << endl;
-        return;
-    }
+    int roomNumber = inputNumber("Enter room number to edit");
 
     for (auto &invoice : invoiceList)
     {
@@ -132,20 +123,21 @@ void InvoiceController::editInvoice()
 void InvoiceController::deleteInvoice()
 {
     int roomNumber, month, year;
-    cout << "Enter room number to delete: ";
-    cin >> roomNumber;
-    cout << "Enter month to delete: ";
-    cin >> month;
-    cout << "Enter year to delete: ";
-    cin >> year;
+    roomNumber = inputNumber("Enter room number to delete");
 
-    if (cin.fail())
+    while (true)
     {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Invalid input. Please enter a valid room number." << endl;
-        return;
+        month = inputNumber("Enter month of Invoice to delete");
+        if (month >= 1 && month <= 12)
+        {
+            break;
+        }
+        else
+        {
+            cout << "Invalid month! Please enter a valid month." << endl;
+        }
     }
+    year = inputNumber("Enter year of Invoice to delete");
     bool found = false;
 
     for (auto it = invoiceList.begin(); it != invoiceList.end(); ++it)
@@ -167,17 +159,7 @@ void InvoiceController::deleteInvoice()
 
 void InvoiceController::markInvoiceAsPaid()
 {
-    int invoiceId;
-    cout << "Enter Invoice ID to mark as paid: ";
-    cin >> invoiceId;
-
-    if (cin.fail())
-    {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cerr << "Invalid input! Please enter a valid Invoice ID." << endl;
-        return;
-    }
+    int invoiceId = inputNumber("Enter Invoice ID to mark as paid");
 
     for (auto &invoice : invoiceList)
     {
@@ -204,10 +186,19 @@ void InvoiceController::markInvoiceAsPaid()
 void InvoiceController::searchInvoice(int roomNumber)
 {
     int month, year;
-    cout << "Enter month to search: ";
-    cin >> month;
-    cout << "Enter year to search: ";
-    cin >> year;
+    while (true)
+    {
+        month = inputNumber("Enter month of Invoice to search");
+        if (month >= 1 && month <= 12)
+        {
+            break;
+        }
+        else
+        {
+            cout << "Invalid month! Please enter a valid month." << endl;
+        }
+    }
+    year = inputNumber("Enter year of Invoice to search");
 
     for (const auto &invoice : invoiceList)
     {
@@ -262,10 +253,20 @@ void InvoiceController::revenueStatistics() const
 {
     double totalRevenue = 0.0;
     int month, year;
-    cout << "Enter month to calculate revenue: ";
-    cin >> month;
-    cout << "Enter year to calculate revenue: ";
-    cin >> year;
+    while (true)
+    {
+        month = inputNumber("Enter month of Invoice to revenue");
+        if (month >= 1 && month <= 12)
+        {
+            break;
+        }
+        else
+        {
+            cout << "Invalid month! Please enter a valid month." << endl;
+        }
+    }
+    year = inputNumber("Enter year of Invoice to revenue");
+
 
     cout << "------------------------- Revenue Statistics ----------------------------" << endl;
 

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include "../utils/utils.h"
+
 
 using namespace std;
 
@@ -11,6 +13,15 @@ void ContractController::createContract()
 {
     Contract contract;
     cin >> contract;
+
+    int newContractId = 1;
+    if (contracts.size() != 0)
+    {
+        Contract lastContract = contracts.back();
+
+        newContractId = lastContract.getContractID() + 1;
+    }
+    contract.setContractID(newContractId);
 
     contracts.add(contract);
     cout << "Contract created successfully!" << endl;
@@ -35,11 +46,10 @@ void ContractController::createContract()
 
 void ContractController::updateContract()
 {
-    int contractID, tenantID, roomNumber, status;
+    int contractID, roomNumber, status;
     string startDate, endDate;
 
-    cout << "Enter contract ID to update: ";
-    cin >> contractID;
+    contractID = inputNumber("Enter contract ID to update");
 
     bool found = false;
     for (auto it = contracts.begin(); it != contracts.end(); ++it)
@@ -49,16 +59,12 @@ void ContractController::updateContract()
             cout << "Current contract details:" << endl;
             cout << *it;
             cout << "Enter new contract details:" << endl;
-            cout << "Enter room number: ";
-            cin >> roomNumber;
-            cout << "Enter start date (yyyy-mm-dd): ";
-            cin >> startDate;
-            cout << "Enter end date (yyyy-mm-dd): ";
-            cin >> endDate;
-            cout << "Enter contract status: ";
-            cin >> status;
 
-            it->setTenantID(tenantID);
+            roomNumber = inputNumber("Enter room number");
+            startDate = inputDate("Enter start date");
+            endDate = inputDate("Enter end date");
+            status = inputNumber("Enter contract status: (1 for Active, 0 for Expired)");
+
             it->setRoomNumber(roomNumber);
             it->setStartDate(startDate);
             it->setEndDate(endDate);
@@ -79,19 +85,26 @@ void ContractController::updateContract()
 
 void ContractController::endContract()
 {
-    int contractID;
-    cout << "Enter contract ID to end: ";
-    cin >> contractID;
+    int contractID = inputNumber("Enter contract ID to end");
 
     bool found = false;
     for (auto it = contracts.begin(); it != contracts.end(); ++it)
     {
         if (it->getContractID() == contractID)
         {
-            it->setStatus(0);
-            cout << "Contract ended successfully!" << endl;
-            found = true;
-            break;
+            if (it->getStatus() == 1)
+            {
+                it->setStatus(0);
+                cout << "Contract ended successfully!" << endl;
+                found = true;
+                break;
+            }
+            else
+            {
+                cout << "Contract already ended!" << endl;
+                found = true;
+                break;
+            }
         }
     }
 
@@ -143,7 +156,7 @@ void ContractController::contractStatistics()
              << "| " << setw(15) << contract.getRoomNumber()
              << "| " << setw(20) << contract.getStartDate()
              << "| " << setw(20) << contract.getEndDate()
-             << "| " << setw(15) << contract.getStatus()
+             << "| " << setw(15) << (contract.getStatus() ? "Active" : "Expired")
              << "|" << endl;
     }
 }
@@ -181,7 +194,6 @@ int ContractController::getRoomByTenant(int tenantID)
         }
     }
     return -1;
-
 }
 
 ContractController::~ContractController() {}

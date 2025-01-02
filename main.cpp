@@ -71,7 +71,7 @@ int main()
                 displayMainMenu();
                 cin >> choice;
 
-                if (choice == 5)
+                if (choice == 6)
                 {
                     break; // Logout
                 }
@@ -85,8 +85,9 @@ int main()
                         cin >> choice;
                         if (choice == 6)
                         {
-                            break; // Back to Main Menu
+                            break;
                         }
+                        int roomNumber = 0;
                         switch (choice)
                         {
                         case 1:
@@ -99,9 +100,7 @@ int main()
                             roomController.deleteRoom();
                             break;
                         case 4:
-                            int roomNumber;
-                            cout << "Enter room number to search: ";
-                            cin >> roomNumber;
+                            roomNumber = inputNumber("Enter room number to search");
                             roomController.searchRoom(roomNumber);
                             break;
                         case 5:
@@ -123,7 +122,7 @@ int main()
 
                         if (choice == 6)
                         {
-                            break; // Back to Main Menu
+                            break;
                         }
                         switch (choice)
                         {
@@ -131,15 +130,14 @@ int main()
                             tenantController.addTenant();
                             break;
                         case 2:
-                            cout << "Enter tenant ID to update: ";
+                            id = inputNumber("Enter tenant ID to update");
                             tenantController.updateTenant(id);
                             break;
                         case 3:
                             tenantController.deleteTenant();
                             break;
                         case 4:
-                            cout << "Enter tenant ID to search: ";
-                            cin >> id;
+                            id = inputNumber("Enter tenant ID to search");
                             tenantController.searchTenant(id);
                             break;
                         case 5:
@@ -159,8 +157,9 @@ int main()
                         cin >> choice;
                         if (choice == 7)
                         {
-                            break; // Back to Main Menu
+                            break;
                         }
+                        int roomNumber = 0;
                         switch (choice)
                         {
                         case 1:
@@ -173,9 +172,7 @@ int main()
                             invoiceController.deleteInvoice();
                             break;
                         case 4:
-                            int roomNumber;
-                            cout << "Enter room number to search: ";
-                            cin >> roomNumber;
+                            roomNumber = inputNumber("Enter room number to search");
                             invoiceController.searchInvoice(roomNumber);
                             break;
                         case 5:
@@ -198,8 +195,9 @@ int main()
                         cin >> choice;
                         if (choice == 6)
                         {
-                            break; // Back to Main Menu
+                            break;
                         }
+                        int userID;
                         switch (choice)
                         {
                         case 1:
@@ -212,9 +210,7 @@ int main()
                             contractController.endContract();
                             break;
                         case 4:
-                            int userID;
-                            cout << "Enter userID to search: ";
-                            cin >> userID;
+                            userID = inputNumber("Enter tenantID to search");
                             contractController.searchContract(userID);
                             break;
                         case 5:
@@ -227,6 +223,33 @@ int main()
                         system("pause");
                     }
                     break;
+                case 5:
+                    int userId;
+                    while (true)
+                    {
+                        displayAccountManagementMenu();
+                        cin >> choice;
+                        if (choice == 4)
+                        {
+                            break;
+                        }
+                        switch (choice)
+                        {
+                        case 1:
+                            userController.addAccount();
+                            break;
+                        case 2:
+                            userId = inputNumber("Enter user ID to delete account");
+                            userController.deleteAccount(userId);
+                            break;
+                        case 3:
+                            userController.changePassword(userId);
+                        default:
+                            cout << "Invalid choice. Please try again." << endl;
+                            break;
+                        }
+                        system("pause");
+                    }
                 default:
                     cout << "Invalid choice. Please try again." << endl;
                     break;
@@ -243,7 +266,7 @@ int main()
                 displayTenantMenu();
                 cin >> choice;
 
-                if (choice == 7)
+                if (choice == 8)
                 {
                     break; // Exit
                 }
@@ -267,6 +290,9 @@ int main()
                     break;
                 case 6:
                     tenantController.updateTenant(userId);
+                    break;
+                case 7:
+                    userController.changePassword(userId);
                     break;
                 default:
                     cout << "Invalid choice! Please try again." << endl;
